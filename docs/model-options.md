@@ -1,158 +1,244 @@
-# 모델별 선택지
+# 모델·양자화 카탈로그
 
-## 1. Kimi K3
+크기는 2026-07-19 기준 Hugging Face 현재 파일의 합계입니다. 저장소 전체 history 용량이 아니라 현재 체크포인트 파일을 기준으로 했습니다.
 
-### 공식 사양
+## 크기 순 정리
 
-- 전체 파라미터: 2.8T
-- 컨텍스트: 1M
-- MoE: 896 experts 중 16개 활성
-- 가중치: MXFP4
-- activation: MXFP8
-- 공식 권장 배포: 가속기 64개 이상인 supernode
-- 전체 가중치 공개 예정일: 2026-07-27
+| 모델 | 포맷 | 현재 파일 크기 | 추천 최소 구성 | Hugging Face |
+|---|---|---:|---|---|
+| gpt-oss-20b | MXFP4 | 공식 runtime 16GB 이내 | GPU 16GB+ | [공식](https://huggingface.co/openai/gpt-oss-20b) |
+| Qwen3.6-27B | GGUF Q4_K_M | 16.8GB | 2×2080 Ti 또는 1×4090 | [공식](https://huggingface.co/Qwen/Qwen3.6-27B) · [GGUF](https://huggingface.co/unsloth/Qwen3.6-27B-GGUF) |
+| Gemma 3 27B | QAT Q4_0 GGUF | 18.1GB | 2×2080 Ti 또는 1×4090 | [QAT GGUF](https://huggingface.co/google/gemma-3-27b-it-qat-q4_0-gguf) |
+| Qwen3-32B | GGUF Q4_K_M | 19.8GB | 1×4090 | [공식](https://huggingface.co/Qwen/Qwen3-32B) · [GGUF](https://huggingface.co/unsloth/Qwen3-32B-GGUF) |
+| Qwen3.6-35B-A3B | GGUF Q4_K_M | 22.1GB | 1×4090, 짧은 context | [공식](https://huggingface.co/Qwen/Qwen3.6-35B-A3B) · [GGUF](https://huggingface.co/unsloth/Qwen3.6-35B-A3B-GGUF) |
+| Qwen3.6-27B | FP8 | 30.9GB | 2×4090 | [FP8](https://huggingface.co/Qwen/Qwen3.6-27B-FP8) |
+| Qwen3.6-35B-A3B | FP8 | 37.5GB | 2×4090 | [FP8](https://huggingface.co/Qwen/Qwen3.6-35B-A3B-FP8) |
+| Qwen3-32B | BF16 | 65.5GB | 2×A100 40GB | [공식](https://huggingface.co/Qwen/Qwen3-32B) |
+| Qwen3.5-122B-A10B | GPTQ INT4 | 78.9GB | 2×A100/H100 80GB | [INT4](https://huggingface.co/Qwen/Qwen3.5-122B-A10B-GPTQ-Int4) |
+| gpt-oss-120b | MXFP4 | 공식 H100 80GB 한 장 | 1×H100 또는 2×A100 | [공식](https://huggingface.co/openai/gpt-oss-120b) |
+| Qwen3-235B-A22B | GPTQ INT4 | 124.5GB | 2×80GB 또는 4×40GB | [INT4](https://huggingface.co/Qwen/Qwen3-235B-A22B-GPTQ-Int4) |
+| Qwen3.5-122B-A10B | FP8 | 127.2GB | 2×H100 | [FP8](https://huggingface.co/Qwen/Qwen3.5-122B-A10B-FP8) |
+| DeepSeek V4 Flash | FP4+FP8 | 159.6GB | 4×H100 | [공식](https://huggingface.co/deepseek-ai/DeepSeek-V4-Flash) |
+| Qwen3.5-397B-A17B | GPTQ INT4 | 235.7GB | 4×80GB 또는 8×40GB | [INT4](https://huggingface.co/Qwen/Qwen3.5-397B-A17B-GPTQ-Int4) |
+| Qwen3-235B-A22B | FP8 | 239.0GB | 4×H100 | [FP8](https://huggingface.co/Qwen/Qwen3-235B-A22B-FP8) |
+| GLM-5.2 | 서드파티 W4A8 | 399.7GB | 8×H100 | [W4A8](https://huggingface.co/PhalaCloud/GLM-5.2-W4AFP8) |
+| Qwen3.5-397B-A17B | FP8 | 406.2GB | 8×H100 | [FP8](https://huggingface.co/Qwen/Qwen3.5-397B-A17B-FP8) |
+| Kimi K2.7 Code | Native INT4 | 595.2GB | 8×H100 경계, 16×H100 권장 | [공식](https://huggingface.co/moonshotai/Kimi-K2.7-Code) |
+| DeepSeek V3.2 | FP8 mixed | 689GB | 16×H100 | [공식](https://huggingface.co/deepseek-ai/DeepSeek-V3.2) |
+| GLM-5.2 | FP8 | 755.6GB | 16×H100 | [공식](https://huggingface.co/zai-org/GLM-5.2-FP8) |
+| DeepSeek V4 Pro | FP4+FP8 | 864.7GB | 16×H100 | [공식](https://huggingface.co/deepseek-ai/DeepSeek-V4-Pro) |
+| Kimi K3 | MXFP4 이론 하한 | 약 1.4TB | 공식 권장 64 accelerators | [공식 블로그](https://www.kimi.com/blog/kimi-k3) |
 
-### 8×H100 판단
+## Qwen3.6
 
-MXFP4를 단순 4bit로 계산해도 가중치 하한이 약 1.4TB입니다. 스케일, 메타데이터, 임베딩, 비양자화 레이어와 런타임 공간까지 고려하면 더 커집니다.
+Qwen3.6은 공식 오픈웨이트로 27B dense와 35B-A3B MoE가 제공됩니다. 코딩, agentic workflow, thinking preservation과 멀티모달을 중시합니다.
 
-| 방법 | 순수 가중치 하한 | 판단 |
-|---|---:|---|
-| 4bit | 1.40TB | 최소 800GB 이상 부족 |
-| 3bit | 1.05TB | 대규모 CPU offload 필요 |
-| 2bit | 700GB | 메타데이터와 런타임 때문에 GPU 단독 불가 |
-| 1.5bit | 525GB | 형식 오버헤드와 KV 캐시를 고려하면 매우 위험 |
-| 1.25bit | 437.5GB | 이론상 적재 가능하나 품질과 엔진 지원이 비현실적 |
+### Qwen3.6-27B
 
-현실적인 실험 구성은 H100 8장과 1.5~2TB 시스템 RAM을 결합한 expert offload입니다. 다만 KDA, expert routing, FP4 kernel을 모두 지원하는 엔진이 필요하고 처리량도 크게 낮아질 수 있습니다.
+- 27B dense
+- native context 262,144
+- BF16: 약 55.6GB
+- FP8: 약 30.9GB
+- GGUF Q4_K_M: 약 16.8GB
+- GGUF Q3_K_M: 약 13.6GB
 
-**결론:** 8×H100에서는 K3 API를 사용하거나 더 작은 오픈웨이트 모델을 선택하는 편이 합리적입니다.
+선택:
 
-## 2. Kimi K2.7 Code
+- 2×2080 Ti: Q4_K_M, llama.cpp layer split
+- 2×4090: Q4 복제본 두 개 또는 FP8 한 복제본
+- 2×A100 40GB 이상: BF16
+- H100: FP8 또는 BF16 복제본
+
+링크:
+
+- [Qwen/Qwen3.6-27B](https://huggingface.co/Qwen/Qwen3.6-27B)
+- [Qwen/Qwen3.6-27B-FP8](https://huggingface.co/Qwen/Qwen3.6-27B-FP8)
+- [unsloth/Qwen3.6-27B-GGUF](https://huggingface.co/unsloth/Qwen3.6-27B-GGUF)
+
+### Qwen3.6-35B-A3B
+
+- 35B total, 약 3B activated
+- BF16: 약 71.9GB
+- FP8: 약 37.5GB
+- GGUF Q4_K_M: 약 22.1GB
+- GGUF Q3_K_M: 약 16.6GB
+
+선택:
+
+- 2×2080 Ti: Q3_K_M만 현실적
+- 2×4090: FP8 한 복제본 또는 Q4를 GPU별 배치
+- A100: BF16 또는 INT4/GGUF
+- H100: FP8
+
+링크:
+
+- [Qwen/Qwen3.6-35B-A3B](https://huggingface.co/Qwen/Qwen3.6-35B-A3B)
+- [Qwen/Qwen3.6-35B-A3B-FP8](https://huggingface.co/Qwen/Qwen3.6-35B-A3B-FP8)
+- [unsloth/Qwen3.6-35B-A3B-GGUF](https://huggingface.co/unsloth/Qwen3.6-35B-A3B-GGUF)
+
+## Qwen3.5
+
+### 35B-A3B
+
+- 공식 GPTQ INT4: 약 24.4GB
+- 4090 한 장의 24GB보다 파일 자체가 커서 단일 GPU 완전 적재는 불가
+- 2×4090 TP/PP 또는 GGUF Q4 한 장 적재
+
+링크:
+
+- [Qwen3.5-35B-A3B](https://huggingface.co/Qwen/Qwen3.5-35B-A3B)
+- [GPTQ INT4](https://huggingface.co/Qwen/Qwen3.5-35B-A3B-GPTQ-Int4)
+- [GGUF](https://huggingface.co/unsloth/Qwen3.5-35B-A3B-GGUF)
+
+### 122B-A10B
+
+- FP8: 약 127.2GB
+- GPTQ INT4: 약 78.9GB
+- H100 2장에서는 FP8
+- A100 40GB 4장 또는 A100 80GB 2장에서는 INT4
+
+링크:
+
+- [Qwen3.5-122B-A10B](https://huggingface.co/Qwen/Qwen3.5-122B-A10B)
+- [FP8](https://huggingface.co/Qwen/Qwen3.5-122B-A10B-FP8)
+- [GPTQ INT4](https://huggingface.co/Qwen/Qwen3.5-122B-A10B-GPTQ-Int4)
+
+### 397B-A17B
+
+- FP8: 약 406.2GB
+- GPTQ INT4: 약 235.7GB
+- 4×H100/A100 80GB: INT4
+- 8×H100: FP8
+- 8×A100 40GB/80GB: INT4
+
+링크:
+
+- [Qwen3.5-397B-A17B](https://huggingface.co/Qwen/Qwen3.5-397B-A17B)
+- [FP8](https://huggingface.co/Qwen/Qwen3.5-397B-A17B-FP8)
+- [GPTQ INT4](https://huggingface.co/Qwen/Qwen3.5-397B-A17B-GPTQ-Int4)
+- [vLLM recipe](https://recipes.vllm.ai/Qwen/Qwen3.5-397B-A17B)
+
+## Qwen3
+
+Qwen3는 Qwen3.5/3.6보다 오래됐지만 dense와 MoE 크기 선택지가 넓고 엔진 지원이 안정적입니다.
+
+### Qwen3-32B
+
+- BF16: 약 65.5GB
+- GGUF Q4_K_M: 약 19.8GB
+- GGUF Q3_K_M: 약 16.0GB
+- 2×2080 Ti에서는 Q3, 1×4090에서는 Q4
+- 2×A100 40GB 이상에서는 BF16
+
+링크:
+
+- [Qwen/Qwen3-32B](https://huggingface.co/Qwen/Qwen3-32B)
+- [unsloth/Qwen3-32B-GGUF](https://huggingface.co/unsloth/Qwen3-32B-GGUF)
+
+### Qwen3-235B-A22B
+
+- BF16: 약 470.2GB
+- FP8: 약 239.0GB
+- GPTQ INT4: 약 124.5GB
+- H100 4장: FP8
+- H100/A100 80GB 2장 또는 A100 40GB 4장: INT4
+
+링크:
+
+- [Qwen/Qwen3-235B-A22B](https://huggingface.co/Qwen/Qwen3-235B-A22B)
+- [FP8](https://huggingface.co/Qwen/Qwen3-235B-A22B-FP8)
+- [GPTQ INT4](https://huggingface.co/Qwen/Qwen3-235B-A22B-GPTQ-Int4)
+- [GGUF](https://huggingface.co/unsloth/Qwen3-235B-A22B-GGUF)
+
+## Kimi
+
+### Kimi K2.7 Code
 
 - 약 1.1T 파라미터
 - Native INT4
-- 체크포인트 약 595GB
-- 설정상 최대 컨텍스트 262,144
-- 코딩과 에이전트 작업에 특화
+- 체크포인트 약 595.2GB
+- 설정상 최대 context 262,144
 
-8×H100에 적재할 수 있지만 런타임 여유가 매우 작습니다. 처음부터 최대 컨텍스트를 사용하지 말고 16K~32K에서 시작해야 합니다.
+8×H100/A100 80GB에서는 체크포인트 적재 후 여유가 매우 작습니다. 16×H100에서는 안정적인 KV 공간을 확보할 수 있습니다.
 
-권장 시작점:
+- [공식 체크포인트](https://huggingface.co/moonshotai/Kimi-K2.7-Code)
+- [vLLM recipe](https://recipes.vllm.ai/moonshotai/Kimi-K2.7-Code)
 
-```text
-tensor parallel: 8
-replicas: 1
-context: 16K → 32K 순차 검증
-KV cache: FP8
-concurrency: 1부터 증가
-```
+### Kimi K3
 
-## 3. Qwen3.5-397B-A17B
+- 2.8T 파라미터
+- 896 experts 중 16개 활성
+- MXFP4 weights, MXFP8 activations
+- 1M context
+- 공식 권장: 64개 이상 accelerator supernode
 
-### FP8
+MXFP4를 단순 4bit로 계산해도 1.4TB이므로 16×H100 80GB에도 들어가지 않습니다.
 
-- 체크포인트 약 406GB
-- 128-element block 단위 fine-grained FP8
-- 공식 모델 카드상 원본과 거의 동일한 성능 지표
-- Transformers, vLLM, SGLang, KTransformers 지원
+- [Kimi K3 공식 블로그](https://www.kimi.com/blog/kimi-k3)
 
-8×H100에서 가장 균형이 좋습니다. 약 230GB의 명목상 공간이 남으므로 런타임, KV 캐시, 동시 요청에 사용할 수 있습니다.
+## DeepSeek
 
-권장 시작점:
+### V4 Flash
 
-```text
-tensor parallel: 8
-replicas: 1
-context: 64K → 128K 순차 검증
-KV cache: FP8
-```
+- 284B total, 13B activated
+- 1M context
+- expert FP4 + 나머지 FP8
+- 약 159.6GB
+- 4×H100부터 권장
 
-### GPTQ INT4
+- [공식 체크포인트](https://huggingface.co/deepseek-ai/DeepSeek-V4-Flash)
+- [vLLM recipe](https://recipes.vllm.ai/deepseek-ai/DeepSeek-V4-Flash)
 
-- 체크포인트 약 236GB
-- TP=4 한 그룹에 적재 가능
-- 4-GPU 복제본 두 개를 구성할 수 있음
+### V4 Pro
 
-FP8보다 처리량과 KV 캐시 여유가 크지만, 실제 업무 데이터에서 양자화 품질 회귀를 확인해야 합니다.
+- 1.6T total, 49B activated
+- 약 864.7GB
+- 16×H100 권장
+- multi-node에서는 TP=8 + PP=2 또는 모델별 EP 비교
 
-```text
-GPUs 0–3: TP=4, replica A
-GPUs 4–7: TP=4, replica B
-```
+- [공식 체크포인트](https://huggingface.co/deepseek-ai/DeepSeek-V4-Pro)
+- [vLLM recipe](https://recipes.vllm.ai/deepseek-ai/DeepSeek-V4-Pro)
 
-## 4. DeepSeek V4 Flash
+## GLM-5.2
 
-- 전체 284B, 활성 13B
-- 1M 컨텍스트 지원
-- post-trained 체크포인트는 expert FP4 + 나머지 FP8 혼합
-- 체크포인트 약 160GB
-- MIT License
+- 753B
+- 공식 FP8: 약 755.6GB
+- 서드파티 W4A8: 약 399.7GB
+- FP8은 16×H100
+- W4A8은 8×H100에서 실험 가능
 
-H100 8장에서는 가장 여유 있는 최신 대형 MoE 중 하나입니다. 단일 TP=8보다 TP=4 복제본 두 개가 서비스 처리량 측면에서 유리할 수 있습니다.
+서드파티 양자화는 코딩, tool call, 장문 context 회귀를 별도로 확인해야 합니다.
 
-H100은 FP4 네이티브 Tensor Core 세대가 아니므로 다음을 먼저 확인해야 합니다.
+- [공식 FP8](https://huggingface.co/zai-org/GLM-5.2-FP8)
+- [서드파티 W4A8](https://huggingface.co/PhalaCloud/GLM-5.2-W4AFP8)
 
-1. 선택한 vLLM/SGLang 버전의 H100 kernel 지원
-2. FP4 가중치의 dequant 또는 mixed-precision 실행 경로
-3. TP=4에서의 expert parallel 통신
-4. 목표 컨텍스트에서의 KV 캐시 사용량
+## gpt-oss
 
-## 5. DeepSeek V4 Pro
+### gpt-oss-20b
 
-- 전체 1.6T, 활성 49B
-- FP4+FP8 mixed 체크포인트 약 865GB
-- 1M 컨텍스트
+- 약 22B total
+- MXFP4
+- 공식적으로 16GB 이내 실행
+- 2080 Ti에서는 GGUF Q4와 llama.cpp/Ollama가 안전
+- 4090에서는 GPU당 한 복제본
 
-체크포인트만으로 640GB를 넘기므로 GPU 단독 적재가 불가능합니다. CPU offload를 추가할 수 있지만 8×H100의 장점을 크게 잃습니다.
+- [공식](https://huggingface.co/openai/gpt-oss-20b)
+- [GGUF](https://huggingface.co/unsloth/gpt-oss-20b-GGUF)
 
-**결론:** V4 Pro 대신 V4 Flash를 권장합니다.
+### gpt-oss-120b
 
-## 6. GLM-5.2
+- 117B total, 5.1B activated
+- 공식적으로 H100 80GB 한 장
+- 8×H100에서는 GPU당 최대 8개 독립 복제본 구성 가능
+- A100은 MXFP4 software kernel을 먼저 검증
 
-- 753B 파라미터
-- 공식 FP8 체크포인트 약 761GB
-- 공식 FP8은 GPU 단독 적재 불가
+- [공식](https://huggingface.co/openai/gpt-oss-120b)
 
-서드파티 W4A8 체크포인트 중 약 400GB인 예가 있어 TP=8 배포는 가능합니다. 그러나 공식 양자화가 아니므로 다음을 반드시 비교해야 합니다.
+## 양자화 선택 규칙
 
-- 실제 코딩·에이전트 태스크 성공률
-- 긴 컨텍스트 회귀
-- tool-call JSON 안정성
-- vLLM/SGLang kernel 지원
-- 체크포인트 배포자의 라이선스와 변환 과정
-
-## 7. DeepSeek V3.2
-
-- 685B 파라미터
-- 공식 체크포인트 약 689GB
-- 공식 포맷은 런타임 공간 없이도 640GB를 초과
-
-INT4 이론 하한은 약 343GB라서 커뮤니티 양자화는 적재할 수 있습니다. 하지만 V4 Flash가 더 작고 최신 공식 mixed-precision 체크포인트를 제공하므로, 특별한 호환성 요구가 없다면 V4 Flash를 우선합니다.
-
-## 8. gpt-oss-120b
-
-- 전체 117B, 활성 5.1B
-- MoE 가중치 MXFP4
-- Apache 2.0
-- 공식적으로 H100 80GB 한 장에서 실행 가능
-
-8×H100의 대표 구성은 GPU당 독립 복제본 하나입니다. 한 요청의 최고 성능보다 총 처리량, 장애 격리, 빠른 롤링 배포가 중요한 서비스에 적합합니다.
-
-Hugging Face 저장소에는 여러 형식이 포함되어 전체 저장소 크기가 더 크므로 공식 다운로드 예시처럼 필요한 `original/*` 파일만 내려받는 것이 좋습니다.
-
-## 선택 규칙
-
-```text
-코딩 품질이 최우선인가?
-├─ 예: Kimi K2.7 Code INT4
-└─ 아니오
-   ├─ 한 모델로 범용·멀티모달을 처리하는가?
-   │  └─ 예: Qwen3.5 FP8
-   ├─ 총 처리량이 최우선인가?
-   │  └─ 예: DeepSeek V4 Flash TP=4 × 2
-   ├─ 운영 단순성과 복제 수가 중요한가?
-   │  └─ 예: gpt-oss-120b TP=1 × 8
-   └─ 대형 양자화 실험이 목적인가?
-      └─ GLM-5.2 W4A8
-```
+| GPU 세대 | 1순위 | 2순위 | 피할 것 |
+|---|---|---|---|
+| Turing, RTX 2080 Ti | GGUF Q4/Q3, GPTQ | AWQ | FP8/MXFP4 전용 최신 kernel 가정 |
+| Ada, RTX 4090 | FP8, GPTQ/AWQ, GGUF Q4 | BF16 소형 모델 | NVLink를 전제로 한 TP |
+| Ampere, A100 | BF16, GPTQ/AWQ INT4 | INT8, weight-only FP8 fallback | FP8 W8A8 네이티브 성능 가정 |
+| Hopper, H100 | FP8, GPTQ/AWQ, INT4 | FP4 software/mixed kernel | 체크포인트가 들어간다는 이유로 KV 공간 무시 |

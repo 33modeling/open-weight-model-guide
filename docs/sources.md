@@ -1,83 +1,121 @@
-# 출처
+# 출처와 측정 기준
 
-기준일은 2026-07-19입니다. 모델 사양은 가능한 한 모델 개발사의 공식 블로그와 공식 Hugging Face 저장소를 사용했습니다.
+기준일은 2026-07-19입니다. 하드웨어는 NVIDIA 공식 사양, 모델은 개발사의 공식 Hugging Face 저장소, 엔진은 공식 문서를 우선했습니다.
 
 ## 하드웨어
 
 - [NVIDIA H100 Tensor Core GPU](https://www.nvidia.com/en-us/data-center/h100/)
   - H100 SXM 80GB
-  - FP8, INT8 Tensor Core 사양
+  - FP8, INT8 Tensor Core
   - NVLink 900GB/s
+- [NVIDIA A100 Tensor Core GPU](https://www.nvidia.com/en-us/data-center/a100/)
+  - 40GB/80GB SKU
+  - BF16, FP16, INT8/INT4
+  - A100 80GB SXM NVLink 600GB/s
+- [NVIDIA RTX 4090](https://www.nvidia.com/en-us/geforce/graphics-cards/40-series/rtx-4090/)
+  - 24GB GDDR6X
+  - Ada, compute capability 8.9
+  - NVLink 미지원
+- [NVIDIA 이전/현재 GeForce 비교](https://www.nvidia.com/en-gb/geforce/graphics-cards/compare/)
+  - RTX 2080 Ti 11GB GDDR6
+- [RTX 2080 Ti User Guide](https://www.nvidia.com/content/geforce-gtx/GEFORCE_RTX_2080_Ti_USER_GUIDE_v02.pdf)
+  - NVLink bridge 구성
+
+## Qwen3.6
+
+- [Qwen/Qwen3.6-27B](https://huggingface.co/Qwen/Qwen3.6-27B)
+- [Qwen/Qwen3.6-27B-FP8](https://huggingface.co/Qwen/Qwen3.6-27B-FP8)
+- [unsloth/Qwen3.6-27B-GGUF](https://huggingface.co/unsloth/Qwen3.6-27B-GGUF)
+- [Qwen/Qwen3.6-35B-A3B](https://huggingface.co/Qwen/Qwen3.6-35B-A3B)
+- [Qwen/Qwen3.6-35B-A3B-FP8](https://huggingface.co/Qwen/Qwen3.6-35B-A3B-FP8)
+- [unsloth/Qwen3.6-35B-A3B-GGUF](https://huggingface.co/unsloth/Qwen3.6-35B-A3B-GGUF)
+
+## Qwen3.5
+
+- [Qwen/Qwen3.5-35B-A3B](https://huggingface.co/Qwen/Qwen3.5-35B-A3B)
+- [Qwen/Qwen3.5-35B-A3B-GPTQ-Int4](https://huggingface.co/Qwen/Qwen3.5-35B-A3B-GPTQ-Int4)
+- [Qwen/Qwen3.5-122B-A10B](https://huggingface.co/Qwen/Qwen3.5-122B-A10B)
+- [Qwen/Qwen3.5-122B-A10B-FP8](https://huggingface.co/Qwen/Qwen3.5-122B-A10B-FP8)
+- [Qwen/Qwen3.5-122B-A10B-GPTQ-Int4](https://huggingface.co/Qwen/Qwen3.5-122B-A10B-GPTQ-Int4)
+- [Qwen/Qwen3.5-397B-A17B](https://huggingface.co/Qwen/Qwen3.5-397B-A17B)
+- [Qwen/Qwen3.5-397B-A17B-FP8](https://huggingface.co/Qwen/Qwen3.5-397B-A17B-FP8)
+- [Qwen/Qwen3.5-397B-A17B-GPTQ-Int4](https://huggingface.co/Qwen/Qwen3.5-397B-A17B-GPTQ-Int4)
+- [Qwen3.5 397B vLLM recipe](https://recipes.vllm.ai/Qwen/Qwen3.5-397B-A17B)
+
+## Qwen3
+
+- [Qwen/Qwen3-32B](https://huggingface.co/Qwen/Qwen3-32B)
+- [unsloth/Qwen3-32B-GGUF](https://huggingface.co/unsloth/Qwen3-32B-GGUF)
+- [Qwen/Qwen3-235B-A22B](https://huggingface.co/Qwen/Qwen3-235B-A22B)
+- [Qwen/Qwen3-235B-A22B-FP8](https://huggingface.co/Qwen/Qwen3-235B-A22B-FP8)
+- [Qwen/Qwen3-235B-A22B-GPTQ-Int4](https://huggingface.co/Qwen/Qwen3-235B-A22B-GPTQ-Int4)
+- [unsloth/Qwen3-235B-A22B-GGUF](https://huggingface.co/unsloth/Qwen3-235B-A22B-GGUF)
 
 ## Kimi
 
 - [Kimi K3 공식 블로그](https://www.kimi.com/blog/kimi-k3)
-  - 2.8T 파라미터
+  - 2.8T
   - 1M context
   - 896 experts 중 16개 활성
   - MXFP4 weights, MXFP8 activations
-  - 64개 이상 accelerator를 갖춘 supernode 권장
-  - 전체 가중치 공개 예정일 2026-07-27
+  - 64개 이상 accelerator supernode 권장
 - [moonshotai/Kimi-K2.7-Code](https://huggingface.co/moonshotai/Kimi-K2.7-Code)
-  - 약 1.1T 파라미터
-  - Native INT4
-  - 최대 길이 설정 262,144
-  - 저장소 크기 약 595GB
 - [Kimi K2.7 Code vLLM recipe](https://recipes.vllm.ai/moonshotai/Kimi-K2.7-Code)
-
-## Qwen
-
-- [Qwen/Qwen3.5-397B-A17B-FP8](https://huggingface.co/Qwen/Qwen3.5-397B-A17B-FP8)
-  - 공식 fine-grained FP8
-  - 저장소 크기 약 406GB
-  - Apache 2.0
-- [Qwen/Qwen3.5-397B-A17B-GPTQ-Int4](https://huggingface.co/Qwen/Qwen3.5-397B-A17B-GPTQ-Int4)
-  - 공식 GPTQ INT4
-  - 저장소 크기 약 236GB
 
 ## DeepSeek
 
 - [deepseek-ai/DeepSeek-V4-Flash](https://huggingface.co/deepseek-ai/DeepSeek-V4-Flash)
-  - 284B total, 13B activated
-  - 1M context
-  - FP4 experts + FP8 non-expert weights
-  - 저장소 크기 약 160GB
-  - MIT
 - [DeepSeek V4 Flash vLLM recipe](https://recipes.vllm.ai/deepseek-ai/DeepSeek-V4-Flash)
 - [deepseek-ai/DeepSeek-V4-Pro](https://huggingface.co/deepseek-ai/DeepSeek-V4-Pro)
-  - 1.6T total, 49B activated
-  - 저장소 크기 약 865GB
+- [DeepSeek V4 Pro vLLM recipe](https://recipes.vllm.ai/deepseek-ai/DeepSeek-V4-Pro)
 - [deepseek-ai/DeepSeek-V3.2](https://huggingface.co/deepseek-ai/DeepSeek-V3.2)
-  - 685B
-  - 공식 저장소 크기 약 689GB
-  - MIT
 
 ## GLM
 
 - [zai-org/GLM-5.2-FP8](https://huggingface.co/zai-org/GLM-5.2-FP8)
-  - 753B
-  - 공식 FP8 저장소 크기 약 761GB
 - [PhalaCloud/GLM-5.2-W4AFP8](https://huggingface.co/PhalaCloud/GLM-5.2-W4AFP8)
-  - 서드파티 W4A8 예시
-  - 저장소 크기 약 400GB
 
-## OpenAI
+## OpenAI gpt-oss
 
+- [openai/gpt-oss-20b](https://huggingface.co/openai/gpt-oss-20b)
+- [unsloth/gpt-oss-20b-GGUF](https://huggingface.co/unsloth/gpt-oss-20b-GGUF)
 - [openai/gpt-oss-120b](https://huggingface.co/openai/gpt-oss-120b)
-  - 117B total, 5.1B activated
-  - MXFP4 MoE weights
-  - H100 80GB 한 장에서 실행 가능
-  - Apache 2.0
 
-## 크기 측정 메모
+## Gemma
 
-Hugging Face 저장소 크기는 Hub API의 `usedStorage` 값을 십진 GB로 반올림했습니다. 저장소에 중복 포맷이나 부가 파일이 포함된 모델은 공식 런타임 적재 조건을 우선했습니다.
+- [google/gemma-3-27b-it-qat-q4_0-gguf](https://huggingface.co/google/gemma-3-27b-it-qat-q4_0-gguf)
 
-체크포인트 크기는 다음을 보장하지 않습니다.
+## 추론 엔진
 
-- 실제 GPU resident memory와 정확히 일치
-- 특정 vLLM/SGLang 버전에서의 kernel 지원
-- 최대 context에서의 적재 가능성
-- 운영 batch와 동시성
+- [vLLM Parallelism and Scaling](https://docs.vllm.ai/en/latest/serving/parallelism_scaling/)
+  - 단일 GPU, TP, PP, multi-node 전략
+  - NVLink가 없을 때 PP 검토
+- [vLLM Quantization](https://docs.vllm.ai/en/stable/features/quantization/)
+  - GPU 세대별 AWQ/GPTQ/FP8/GGUF 지원
+- [SGLang GitHub](https://github.com/sgl-project/sglang)
+  - RadixAttention, TP/PP/EP/DP, 구조화 출력, quantization
+- [SGLang Server Arguments](https://docs.sglang.ai/advanced_features/server_arguments.html)
+- [Ollama FAQ](https://docs.ollama.com/faq)
+  - 한 GPU에 들어가면 단일 GPU 적재, 아니면 사용 가능한 GPU에 분산
+- [Ollama GPU Support](https://docs.ollama.com/gpu)
+  - RTX 2080 Ti, RTX 4090, A100, H100 지원
+- [llama.cpp Multi-GPU](https://github.com/ggml-org/llama.cpp/blob/master/docs/multi-gpu.md)
+  - layer/tensor split과 multi-GPU 주의점
 
-배포 시점에 공식 모델 카드와 추론 엔진의 최신 지원 현황을 다시 확인하세요.
+## 체크포인트 크기 측정
+
+Hugging Face Hub API의 현재 `siblings[].size` 중 `.safetensors`와 `.gguf` 파일을 합산했습니다.
+
+이 방식의 장점:
+
+- 저장소 과거 commit의 LFS 용량을 제외
+- 현재 사용자가 다운로드할 파일 크기에 가까움
+- 이론적 bits-per-weight보다 scale과 고정밀도 tensor 오버헤드를 반영
+
+예외:
+
+- GGUF 저장소는 여러 quant 파일을 함께 제공하므로 특정 파일 하나의 크기를 사용
+- gpt-oss 저장소는 여러 포맷이 있어 공식 runtime 적재 조건을 우선
+- Kimi K3는 아직 실제 체크포인트 크기 대신 파라미터 × bits 이론 하한 사용
+
+파일 크기는 실제 GPU resident memory와 정확히 같지 않습니다. engine loader가 임시 buffer나 변환된 tensor를 추가로 만들 수 있습니다.

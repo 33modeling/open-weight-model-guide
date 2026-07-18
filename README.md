@@ -1,130 +1,94 @@
-# 8×H100 오픈웨이트 LLM 배포 가이드
+# 멀티 GPU 오픈웨이트 LLM 배포 가이드
 
-H100 SXM 80GB 8장으로 실행할 수 있는 대형 오픈웨이트 모델과 양자화 선택지를 정리한 실무 가이드입니다.
+2×RTX 2080 Ti부터 16×H100까지, GPU 구성별로 실행 가능한 오픈웨이트 모델과 양자화 포맷, 추론 엔진을 정리한 실무 가이드입니다.
 
 > 기준일: 2026-07-19
 >
-> 기준 장비: H100 SXM 80GB × 8, HGX/DGX NVLink·NVSwitch 구성
->
-> 범위: 추론 전용. 파인튜닝과 학습 메모리는 포함하지 않습니다.
+> 범위: 추론 전용. 학습·파인튜닝 메모리는 포함하지 않습니다.
 
-## 한눈에 보는 결론
+## 포함된 하드웨어
 
-| 목적 | 권장 모델 | 구성 | 판단 |
+| GPU 구성 | 명목 VRAM | 주 연결 방식 | 권장 용도 |
+|---|---:|---|---|
+| 2×RTX 2080 Ti 11GB | 22GB | PCIe, 선택적 NVLink bridge | GGUF 로컬 추론 |
+| 2×RTX 4090 24GB | 48GB | PCIe 4.0, NVLink 없음 | 27B~35B 양자화, 2 replicas |
+| 2×A100 40GB | 80GB | PCIe/NVLink | 32B BF16 또는 70B급 INT4 |
+| 4×A100 40GB | 160GB | HGX/NVSwitch 권장 | 122B~235B INT4 |
+| 8×A100 40GB | 320GB | HGX/NVSwitch | 397B INT4 |
+| 2×A100 80GB | 160GB | PCIe/NVLink | 235B INT4 |
+| 4×A100 80GB | 320GB | HGX/NVSwitch | 397B INT4 |
+| 8×A100 80GB | 640GB | HGX/NVSwitch | 397B INT4, 1T INT4 경계 |
+| 2×H100 80GB | 160GB | NVLink | 122B FP8, 235B INT4 |
+| 4×H100 80GB | 320GB | NVLink/NVSwitch | 397B INT4, V4 Flash |
+| 8×H100 80GB | 640GB | HGX/DGX NVSwitch | 397B FP8, Kimi K2.7 경계 |
+| 16×H100 80GB | 1.28TB | 2 nodes + InfiniBand 권장 | V4 Pro, GLM-5.2 FP8 |
+
+A100은 40GB와 80GB SKU 결과가 완전히 다르므로 별도로 계산했습니다.
+
+## 구성별 1순위
+
+| 구성 | 1순위 모델 | 포맷 | 엔진 |
 |---|---|---|---|
-| 코딩·에이전트 최우선 | Kimi K2.7 Code | Native INT4, TP=8 | 가능하지만 메모리가 매우 빠듯함 |
-| 범용·멀티모달 균형 | Qwen3.5-397B-A17B | FP8, TP=8 | 가장 무난한 단일 모델 구성 |
-| 처리량 우선 | DeepSeek V4 Flash | FP4+FP8, TP=4 × 2 replicas | 모델 두 개를 병렬 서비스하기 좋음 |
-| 높은 동시성·운영 단순성 | gpt-oss-120b | MXFP4, TP=1 × 8 replicas | GPU 한 장당 한 인스턴스 |
-| 대형 모델 실험 | GLM-5.2 | 서드파티 W4A8, TP=8 | 가능하지만 양자화와 커널 검증 필요 |
-| Kimi K3 자체 호스팅 | Kimi K3 | CPU expert offload | 8×H100만으로는 불가능 |
+| 2×2080 Ti | [Qwen3.6-27B](https://huggingface.co/Qwen/Qwen3.6-27B) | [GGUF Q4_K_M 약 16.8GB](https://huggingface.co/unsloth/Qwen3.6-27B-GGUF) | llama.cpp |
+| 2×4090 | [Qwen3.6-35B-A3B](https://huggingface.co/Qwen/Qwen3.6-35B-A3B) | [FP8 약 37.5GB](https://huggingface.co/Qwen/Qwen3.6-35B-A3B-FP8) | vLLM 또는 SGLang |
+| 2×A100 40GB | [Qwen3-32B](https://huggingface.co/Qwen/Qwen3-32B) | BF16 약 65.5GB | vLLM |
+| 4×A100 40GB | [Qwen3-235B-A22B](https://huggingface.co/Qwen/Qwen3-235B-A22B) | [GPTQ INT4 약 124.5GB](https://huggingface.co/Qwen/Qwen3-235B-A22B-GPTQ-Int4) | vLLM |
+| 8×A100 40GB | [Qwen3.5-397B-A17B](https://huggingface.co/Qwen/Qwen3.5-397B-A17B) | [GPTQ INT4 약 235.7GB](https://huggingface.co/Qwen/Qwen3.5-397B-A17B-GPTQ-Int4) | vLLM |
+| 2×A100 80GB | [Qwen3-235B-A22B](https://huggingface.co/Qwen/Qwen3-235B-A22B) | GPTQ INT4 | vLLM |
+| 4×A100 80GB | [Qwen3.5-397B-A17B](https://huggingface.co/Qwen/Qwen3.5-397B-A17B) | GPTQ INT4 | vLLM |
+| 8×A100 80GB | [Qwen3.5-397B-A17B](https://huggingface.co/Qwen/Qwen3.5-397B-A17B) | GPTQ INT4, 넓은 KV | vLLM/SGLang |
+| 2×H100 | [Qwen3.5-122B-A10B](https://huggingface.co/Qwen/Qwen3.5-122B-A10B) | [FP8 약 127.2GB](https://huggingface.co/Qwen/Qwen3.5-122B-A10B-FP8) | vLLM |
+| 4×H100 | [DeepSeek V4 Flash](https://huggingface.co/deepseek-ai/DeepSeek-V4-Flash) | FP4+FP8 약 159.6GB | SGLang 또는 vLLM |
+| 8×H100 | [Qwen3.5-397B-A17B](https://huggingface.co/Qwen/Qwen3.5-397B-A17B) | [FP8 약 406.2GB](https://huggingface.co/Qwen/Qwen3.5-397B-A17B-FP8) | vLLM/SGLang |
+| 16×H100 | [DeepSeek V4 Pro](https://huggingface.co/deepseek-ai/DeepSeek-V4-Pro) | FP4+FP8 약 864.7GB | SGLang 또는 vLLM multi-node |
 
-개인적으로는 다음 순서로 선택합니다.
+이 표의 1순위는 “최대 파라미터”만으로 고르지 않았습니다. GPU 세대의 네이티브 정밀도, KV 캐시 여유, 통신 구조와 엔진 성숙도를 함께 고려했습니다.
 
-1. 범용 서비스: **Qwen3.5-397B-A17B-FP8**
-2. 코딩 전용: **Kimi K2.7 Code Native INT4**
-3. 처리량 전용: **DeepSeek V4 Flash TP=4 두 복제본**
-4. 다중 사용자 서비스: **gpt-oss-120b GPU당 한 복제본**
+## 엔진 선택 요약
 
-## 모델별 적합성
+| 상황 | 최적 엔진 | 이유 |
+|---|---|---|
+| H100/A100 프로덕션 API | **vLLM** | 높은 동시성, 넓은 모델 지원, TP/PP/DP와 multi-node |
+| 대형 MoE·반복 prefix·agent workload | **SGLang** | RadixAttention, EP, PD disaggregation, 구조화 출력 |
+| 4090/2080 Ti의 GGUF와 CPU offload | **llama.cpp** | 세밀한 GPU layer split, 낮은 오버헤드, 오래된 GPU 지원 |
+| 가장 간단한 로컬 실행 | **Ollama** | 자동 GPU 선택·분산, 모델 관리가 쉬움 |
 
-아래 크기는 Hugging Face 저장소의 실제 체크포인트 크기 또는 공식 런타임 적재 조건을 우선 사용했습니다. `640GB`는 명목상 합계이며, 실제로는 CUDA 컨텍스트, 통신 버퍼, activation, KV 캐시 공간을 남겨야 합니다.
+중요한 예외:
 
-| 모델 | 총/활성 파라미터 | 포맷 | 체크포인트·가중치 크기 | 8×H100 |
-|---|---:|---|---:|---|
-| Kimi K3 | 2.8T / 16 of 896 experts | MXFP4 | 이론 하한 약 1.4TB | 불가 |
-| Kimi K2.7 Code | 약 1.1T | Native INT4 | 약 595GB | 가능, 매우 빠듯 |
-| Qwen3.5-397B-A17B | 397B / 17B | FP8 | 약 406GB | 가능 |
-| Qwen3.5-397B-A17B | 397B / 17B | GPTQ INT4 | 약 236GB | 여유 있음 |
-| DeepSeek V4 Flash | 284B / 13B | FP4+FP8 mixed | 약 160GB | 여유 있음 |
-| DeepSeek V4 Pro | 1.6T / 49B | FP4+FP8 mixed | 약 865GB | GPU 단독 불가 |
-| GLM-5.2 | 753B | FP8 | 약 761GB | GPU 단독 불가 |
-| GLM-5.2 | 753B | 서드파티 W4A8 | 약 400GB | 실험적으로 가능 |
-| DeepSeek V3.2 | 685B | FP8 mixed | 약 689GB | GPU 단독 불가 |
-| DeepSeek V3.2 | 685B | INT4 계열 | 이론 하한 약 343GB | 커뮤니티 양자화로 가능 |
-| gpt-oss-120b | 117B / 5.1B | MXFP4 | 공식적으로 H100 80GB 한 장 | 매우 여유 있음 |
+- NVLink가 없는 2×4090에서는 모델이 한 장에 들어가면 TP=2보다 **GPU당 독립 인스턴스 하나씩** 두는 편이 대체로 낫습니다.
+- 2×2080 Ti에서는 최신 FP8/MXFP4 경로보다 **GGUF Q3/Q4 + llama.cpp layer split**이 가장 안전합니다.
+- A100은 FP8 Tensor Core가 없으므로 H100용 FP8 결과를 그대로 기대하면 안 됩니다. BF16, GPTQ/AWQ INT4를 우선합니다.
+- 16×H100이 두 노드라면 8-way TP + 2-way PP 또는 모델별 EP를 사용하고, InfiniBand/GPUDirect RDMA가 필요합니다.
 
-상세 판단과 주의점은 [모델별 선택지](docs/model-options.md)를 참고하세요.
+자세한 비교는 [엔진 선택 가이드](docs/engine-selection.md)를 참고하세요.
 
-## 640GB를 전부 가중치에 쓸 수 없는 이유
+## 모델 계열
 
-운영 시작점으로 GPU 한 장당 최소 8~12GB를 런타임에 남기면, 가중치 예산은 대략 다음과 같습니다.
+이 저장소는 다음 계열을 비교합니다.
 
-```text
-총 VRAM             8 × 80GB = 640GB
-런타임 예약         8 × (8~12GB) = 64~96GB
-실용 가중치 예산    약 544~576GB
-```
-
-여기에 긴 컨텍스트와 동시 요청을 위한 KV 캐시가 추가됩니다. 따라서 595GB인 Kimi K2.7 Code는 적재 자체는 가능해도 컨텍스트와 배치가 제한됩니다. 반면 406GB인 Qwen3.5 FP8은 런타임과 KV 캐시에 훨씬 넓은 여유를 제공합니다.
-
-계산 방식과 Kimi K3 비트별 하한은 [메모리 산정법](docs/memory-sizing.md)에 정리했습니다.
-
-## 권장 배치 토폴로지
-
-### A. 코딩 성능 우선
-
-```text
-Kimi K2.7 Code Native INT4
-└─ TP=8, replicas=1
-```
-
-- 컨텍스트는 16K~32K부터 시작
-- FP8 KV 캐시 사용
-- 낮은 동시 요청으로 시작
-- 262K 최대 컨텍스트는 8×H100 80GB에서 실용적이지 않을 가능성이 큼
-
-### B. 가장 균형 잡힌 구성
-
-```text
-Qwen3.5-397B-A17B-FP8
-└─ TP=8, replicas=1
-```
-
-- 64K~128K 컨텍스트부터 검증
-- 범용 추론, 코딩, 멀티모달을 한 모델로 처리
-- 공식 FP8은 원본에 가까운 품질을 목표로 하므로 INT4보다 보수적인 선택
-
-### C. 처리량 우선
-
-```text
-DeepSeek V4 Flash
-├─ GPUs 0–3: TP=4, replica A
-└─ GPUs 4–7: TP=4, replica B
-```
-
-- 두 복제본 앞에 라운드로빈 또는 least-connections 라우터 배치
-- 먼저 TP=4 한 복제본에서 H100 커널 호환성과 최대 컨텍스트를 검증
-- H100 사양에는 FP8과 INT8 Tensor Core가 명시되지만 FP4는 없으므로, FP4 부분의 실제 성능은 추론 엔진과 커널 구현에 크게 좌우됨
-
-### D. 동시 사용자 수 우선
-
-```text
-gpt-oss-120b MXFP4
-├─ GPU 0: replica 1
-├─ GPU 1: replica 2
-├─ ...
-└─ GPU 7: replica 8
-```
-
-- 장애 격리와 롤링 배포가 쉬움
-- 단일 초대형 모델보다 높은 총 처리량을 얻기 쉬움
-- 모델 전체 저장소가 아니라 공식 문서의 `original/*` 다운로드 방식을 사용
-
-## 중요한 전제
-
-- 이 가이드는 **8-GPU 단일 노드 HGX/DGX**를 가정합니다.
-- PCIe 전용 구성이나 여러 노드에 분산된 H100 8장은 통신 병목 때문에 결과가 달라집니다.
-- MoE의 활성 파라미터 수가 작아도 전체 expert 가중치는 GPU 또는 CPU 메모리 어딘가에 있어야 합니다.
-- 체크포인트 크기가 VRAM보다 작다는 사실만으로 서비스 가능성이 보장되지는 않습니다.
-- 긴 컨텍스트, 높은 batch, speculative decoding, CUDA Graph는 추가 메모리를 사용합니다.
-- 서드파티 양자화는 원본 모델과 별도로 품질·라이선스·커널 호환성을 검증해야 합니다.
+- [Qwen3](https://huggingface.co/collections/Qwen/qwen3)
+- [Qwen3.5](https://huggingface.co/collections/Qwen/qwen35)
+- [Qwen3.6-27B](https://huggingface.co/Qwen/Qwen3.6-27B), [Qwen3.6-35B-A3B](https://huggingface.co/Qwen/Qwen3.6-35B-A3B)
+- [Kimi K2.7 Code](https://huggingface.co/moonshotai/Kimi-K2.7-Code), Kimi K3
+- [DeepSeek V4 Flash](https://huggingface.co/deepseek-ai/DeepSeek-V4-Flash), [V4 Pro](https://huggingface.co/deepseek-ai/DeepSeek-V4-Pro)
+- [GLM-5.2](https://huggingface.co/zai-org/GLM-5.2-FP8)
+- [gpt-oss-20b](https://huggingface.co/openai/gpt-oss-20b), [gpt-oss-120b](https://huggingface.co/openai/gpt-oss-120b)
+- [Gemma 3 27B QAT](https://huggingface.co/google/gemma-3-27b-it-qat-q4_0-gguf)
 
 ## 문서
 
-- [모델별 선택지와 운영 판단](docs/model-options.md)
-- [메모리 산정법과 Kimi K3 분석](docs/memory-sizing.md)
-- [공식 출처와 체크포인트](docs/sources.md)
+- [전체 하드웨어 × 모델 가능 조건 매트릭스](docs/hardware-matrix.md)
+- [vLLM vs SGLang vs Ollama vs llama.cpp](docs/engine-selection.md)
+- [모델·양자화 카탈로그와 Hugging Face 링크](docs/model-options.md)
+- [VRAM 계산법과 Kimi K3 분석](docs/memory-sizing.md)
+- [공식 출처](docs/sources.md)
+
+## 판정 기호
+
+- ✅: GPU 단독 적재와 실용적인 런타임 공간 확보
+- △: 짧은 context, 낮은 concurrency, 특정 kernel 또는 양자화 필요
+- 🧪: 서드파티 양자화·비네이티브 정밀도·CPU offload 실험
+- ❌: GPU 단독 적재 불가
 
 ## License
 
