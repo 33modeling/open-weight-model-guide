@@ -1,6 +1,6 @@
 # 출처와 측정 기준
 
-기준일은 2026-07-19입니다. 하드웨어는 NVIDIA 공식 사양, 모델은 개발사의 공식 Hugging Face 저장소, 엔진은 공식 문서를 우선했습니다.
+기준일은 2026-07-20입니다. 하드웨어는 NVIDIA 공식 사양, 모델은 개발사의 공식 Hugging Face 저장소, 엔진은 공식 문서를 우선했습니다.
 
 ## 하드웨어
 
@@ -97,6 +97,9 @@
 - [DeepSeek V4 Flash vLLM recipe](https://recipes.vllm.ai/deepseek-ai/DeepSeek-V4-Flash)
 - [deepseek-ai/DeepSeek-V4-Pro](https://huggingface.co/deepseek-ai/DeepSeek-V4-Pro)
 - [DeepSeek V4 Pro vLLM recipe](https://recipes.vllm.ai/deepseek-ai/DeepSeek-V4-Pro)
+- [SGLang DeepSeek V4 cookbook](https://docs.sglang.io/cookbook/autoregressive/DeepSeek/DeepSeek-V4)
+  - H100에서 V4 Flash TP=8, V4 Pro 2-node TP=16 검증 구성
+  - 원본 FP4 checkpoint는 Hopper에서 W4A16 TP-only 경로
 - [deepseek-ai/DeepSeek-V3.2](https://huggingface.co/deepseek-ai/DeepSeek-V3.2)
 
 ## GLM
@@ -135,6 +138,8 @@
   - RTX 2080 Ti, RTX 4090, A100, H100 지원
 - [llama.cpp Multi-GPU](https://github.com/ggml-org/llama.cpp/blob/master/docs/multi-gpu.md)
   - layer/tensor split과 multi-GPU 주의점
+- [llama.cpp HTTP Server](https://github.com/ggml-org/llama.cpp/blob/master/tools/server/README.md)
+  - OpenAI 호환 endpoint, API key, context/parallel, auto-fit와 metrics
 
 ## 체크포인트 크기 측정
 

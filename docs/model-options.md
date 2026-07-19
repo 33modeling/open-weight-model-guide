@@ -20,7 +20,7 @@
 | Qwen3.5-122B-A10B | FP8 | 127.2GB | 2×H100 | [FP8](https://huggingface.co/Qwen/Qwen3.5-122B-A10B-FP8) |
 | MiniMax-M2.7 | 커뮤니티 AWQ W4A16 | 119.8GB | 4×A100 40GB | [AWQ](https://huggingface.co/demon-zombie/MiniMax-M2.7-AWQ-4bit) |
 | MiniMax-M2.7 | GGUF UD-Q4_K_S | 131.0GB | 4×A100 40GB | [GGUF](https://huggingface.co/unsloth/MiniMax-M2.7-GGUF) |
-| DeepSeek V4 Flash | FP4+FP8 | 159.6GB | 4×H100 | [공식](https://huggingface.co/deepseek-ai/DeepSeek-V4-Flash) |
+| DeepSeek V4 Flash | FP4+FP8 | 159.6GB | 8×H100, Hopper W4A16 TP=8 | [공식](https://huggingface.co/deepseek-ai/DeepSeek-V4-Flash) |
 | MiniMax-M2.7 | 공식 FP8 | 230.1GB | 4×A100 80GB 또는 4×H100 | [공식](https://huggingface.co/MiniMaxAI/MiniMax-M2.7) |
 | Qwen3.5-397B-A17B | GPTQ INT4 | 235.7GB | 4×80GB 또는 8×40GB | [INT4](https://huggingface.co/Qwen/Qwen3.5-397B-A17B-GPTQ-Int4) |
 | Qwen3-235B-A22B | FP8 | 239.0GB | 4×H100 | [FP8](https://huggingface.co/Qwen/Qwen3-235B-A22B-FP8) |
@@ -268,10 +268,12 @@ MiniMax M2 계열은 약 230B total, 10B activated MoE이며 코딩 agent, tool 
 - 1M context
 - expert FP4 + 나머지 FP8
 - 약 159.6GB
-- 4×H100부터 권장
+- H100은 원본 FP4 expert를 W4A16 Hopper 경로로 실행하므로 SGLang 검증 구성인 TP=8 권장
+- 파일 크기만으로 4×H100 가능 판정을 내리지 않음
 
 - [공식 체크포인트](https://huggingface.co/deepseek-ai/DeepSeek-V4-Flash)
 - [vLLM recipe](https://recipes.vllm.ai/deepseek-ai/DeepSeek-V4-Flash)
+- [SGLang DeepSeek V4 cookbook](https://docs.sglang.io/cookbook/autoregressive/DeepSeek/DeepSeek-V4)
 
 ### V4 Pro
 

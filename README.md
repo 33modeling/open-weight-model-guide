@@ -2,7 +2,7 @@
 
 2×RTX 2080 Ti부터 16×H100까지, GPU 구성별로 실행 가능한 오픈웨이트 모델과 양자화 포맷, 추론 엔진을 정리한 실무 가이드입니다.
 
-> 기준일: 2026-07-19
+> 기준일: 2026-07-20
 >
 > 범위: 추론 전용. 학습·파인튜닝 메모리는 포함하지 않습니다.
 
@@ -19,8 +19,8 @@
 | 4×A100 80GB | 320GB | HGX/NVSwitch | 397B INT4 |
 | 8×A100 80GB | 640GB | HGX/NVSwitch | 397B INT4, 1T INT4 경계 |
 | 2×H100 80GB | 160GB | NVLink | 122B FP8, 235B INT4 |
-| 4×H100 80GB | 320GB | NVLink/NVSwitch | 397B INT4, V4 Flash |
-| 8×H100 80GB | 640GB | HGX/DGX NVSwitch | GLM-5.2 W4A8, Kimi K2.6/K2.7 INT4 경계 |
+| 4×H100 80GB | 320GB | NVLink/NVSwitch | MiniMax-M2.7 FP8, 397B INT4 |
+| 8×H100 80GB | 640GB | HGX/DGX NVSwitch | GLM-5.2 W4A8, DeepSeek V4 Flash, Kimi K2.6/K2.7 INT4 경계 |
 | 16×H100 80GB | 1.28TB | 2 nodes + InfiniBand 권장 | V4 Pro, GLM-5.2 FP8 |
 
 A100은 40GB와 80GB SKU 결과가 완전히 다르므로 별도로 계산했습니다.
@@ -41,8 +41,9 @@ A100은 40GB와 80GB SKU 결과가 완전히 다르므로 별도로 계산했습
 | 4×A100 80GB | 최대 모델 | [Qwen3.5-397B-A17B GPTQ INT4](https://huggingface.co/Qwen/Qwen3.5-397B-A17B-GPTQ-Int4) | vLLM |
 | 8×A100 80GB | 균형·넓은 KV | [Qwen3.5-397B-A17B GPTQ INT4](https://huggingface.co/Qwen/Qwen3.5-397B-A17B-GPTQ-Int4) | vLLM/SGLang |
 | 2×H100 | 균형 | [Qwen3.5-122B-A10B FP8](https://huggingface.co/Qwen/Qwen3.5-122B-A10B-FP8) | vLLM |
-| 4×H100 | 최신 대형 MoE | [DeepSeek V4 Flash](https://huggingface.co/deepseek-ai/DeepSeek-V4-Flash) | SGLang/vLLM |
+| 4×H100 | coding agent | [MiniMax-M2.7 FP8](https://huggingface.co/MiniMaxAI/MiniMax-M2.7) | SGLang/vLLM |
 | 8×H100 | 장문 context·코딩 | [GLM-5.2 W4A8](https://huggingface.co/PhalaCloud/GLM-5.2-W4AFP8) | SGLang |
+| 8×H100 | 최신 대형 MoE | [DeepSeek V4 Flash](https://huggingface.co/deepseek-ai/DeepSeek-V4-Flash), Hopper TP=8 | SGLang |
 | 8×H100 | agentic coding·멀티모달 | [Kimi K2.6 Native INT4](https://huggingface.co/moonshotai/Kimi-K2.6), 적재 경계 | vLLM/SGLang |
 | 8×H100 | KV 여유·안정적 운영 | [Qwen3.5-397B-A17B FP8](https://huggingface.co/Qwen/Qwen3.5-397B-A17B-FP8) | vLLM/SGLang |
 | 16×H100 | 최대 모델 | [DeepSeek V4 Pro](https://huggingface.co/deepseek-ai/DeepSeek-V4-Pro) | SGLang/vLLM multi-node |
@@ -63,7 +64,7 @@ A100은 40GB와 80GB SKU 결과가 완전히 다르므로 별도로 계산했습
 - NVLink가 없는 2×4090에서는 모델이 한 장에 들어가면 TP=2보다 **GPU당 독립 인스턴스 하나씩** 두는 편이 대체로 낫습니다.
 - 2×2080 Ti에서는 최신 FP8/MXFP4 경로보다 **GGUF Q3/Q4 + llama.cpp layer split**이 가장 안전합니다.
 - A100은 FP8 Tensor Core가 없으므로 H100용 FP8 결과를 그대로 기대하면 안 됩니다. BF16, GPTQ/AWQ INT4를 우선합니다.
-- 16×H100이 두 노드라면 8-way TP + 2-way PP 또는 모델별 EP를 사용하고, InfiniBand/GPUDirect RDMA가 필요합니다.
+- 16×H100이 두 노드라면 모델별 검증 토폴로지를 따릅니다. 예를 들어 DeepSeek V4 Pro는 SGLang Hopper 경로에서 TP=16, vLLM 시작점은 노드 내부 TP=8 + 노드 간 PP=2이며 InfiniBand/GPUDirect RDMA가 필요합니다.
 
 자세한 비교는 [엔진 선택 가이드](docs/engine-selection.md)를 참고하세요.
 
@@ -86,6 +87,10 @@ A100은 40GB와 80GB SKU 결과가 완전히 다르므로 별도로 계산했습
 - [코딩 전용 GPU × 모델 선택표](docs/coding-matrix.md)
 - [전체 하드웨어 × 모델 가능 조건 매트릭스](docs/hardware-matrix.md)
 - [vLLM vs SGLang vs Ollama vs llama.cpp](docs/engine-selection.md)
+- [llama.cpp · vLLM · SGLang 서빙 스크립트 인덱스](docs/serving/README.md)
+  - [llama.cpp](docs/serving/llama-cpp.md)
+  - [vLLM](docs/serving/vllm.md)
+  - [SGLang](docs/serving/sglang.md)
 - [모델·양자화 카탈로그와 Hugging Face 링크](docs/model-options.md)
 - [VRAM 계산법과 Kimi K3 분석](docs/memory-sizing.md)
 - [공식 출처](docs/sources.md)

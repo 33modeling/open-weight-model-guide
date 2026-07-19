@@ -2,9 +2,11 @@
 
 이 문서는 일반 대화·멀티모달 종합 순위가 아니라 코드 생성, repository 수정, terminal 작업, tool calling과 장시간 agent loop만을 기준으로 합니다.
 
-> 기준일: 2026-07-19
+> 기준일: 2026-07-20
 >
 > context 값은 최대 지원 길이가 아니라 첫 배포 시 권장하는 검증 시작점입니다.
+
+각 행의 실제 실행 명령은 [llama.cpp·vLLM·SGLang 서빙 스크립트 인덱스](serving/README.md)에서 GPU 구성별로 연결합니다.
 
 ## 구성별 코딩 1순위
 
