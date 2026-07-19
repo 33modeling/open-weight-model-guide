@@ -37,6 +37,16 @@
 
 GLM-5.2 W4A8은 현재 SGLang 전용 경로로 보는 것이 안전합니다. Kimi K2.6은 두 엔진 모두 공식 지원하지만 8×H100에서는 엔진보다 메모리 여유가 먼저 병목이므로, context 4K~8K와 concurrency 1에서 적재를 확인한 뒤 비교합니다. Ollama와 llama.cpp는 이 규모의 HGX 프로덕션 서빙 1순위가 아닙니다.
 
+### 4×A100 MiniMax M2.7
+
+| 구성 | 체크포인트 | 1순위 엔진 | 이유 |
+|---|---|---|---|
+| 4×A100 40GB | community AWQ W4A16 119.8GB | vLLM | compressed-tensors/Marlin과 TP=4 실행 예시 |
+| 4×A100 40GB 대안 | GGUF UD-Q4_K_S 131.0GB | llama.cpp | vLLM quant 문제가 있을 때 layer split |
+| 4×A100 80GB | 공식 FP8 230.1GB | SGLang 또는 vLLM | MiniMax 공식 지원과 TP=4 recipe |
+
+A100은 FP8 Tensor Core가 없으므로 공식 FP8이 적재되더라도 H100과 같은 속도는 나오지 않습니다. 40GB 구성은 W4A16 community quant 회귀 검증이 필수이고, 80GB 구성은 공식 FP8로 품질을 보존하는 편이 기본값입니다. 코딩 전용 전체 비교는 [코딩 전용 모델 선택표](coding-matrix.md)를 참고하세요.
+
 ## 기능 비교
 
 | 항목 | vLLM | SGLang | Ollama | llama.cpp |

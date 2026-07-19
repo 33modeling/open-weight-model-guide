@@ -120,6 +120,8 @@ vllm serve Qwen/Qwen3.6-35B-A3B-FP8 \
 
 A100은 BF16, FP16, INT8, INT4 Tensor Core를 제공하지만 FP8 Tensor Core 세대가 아닙니다. 공식 FP8 체크포인트를 실행할 수 있는 software fallback이 있더라도 H100과 같은 처리량을 기대해서는 안 됩니다.
 
+코딩 작업만 비교할 때는 [코딩 전용 모델 선택표](coding-matrix.md)를 참고하세요. 특히 4×A100은 40GB에서 MiniMax M2.7 community W4A16, 80GB에서 공식 M2.7 FP8으로 선택이 갈립니다.
+
 ### A100 40GB
 
 | 모델 | 2장 80GB | 4장 160GB | 8장 320GB | 권장 포맷 |

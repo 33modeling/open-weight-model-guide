@@ -72,6 +72,25 @@
 - [moonshotai/Kimi-K2.7-Code](https://huggingface.co/moonshotai/Kimi-K2.7-Code)
 - [Kimi K2.7 Code vLLM recipe](https://recipes.vllm.ai/moonshotai/Kimi-K2.7-Code)
 
+## MiniMax
+
+- [MiniMaxAI/MiniMax-M2.7](https://huggingface.co/MiniMaxAI/MiniMax-M2.7)
+  - 약 230B total, 10B activated, block FP8
+  - 현재 safetensors 약 230.1GB
+  - SWE-Pro 56.22, Terminal Bench 2 57.0, NL2Repo 39.8
+- [MiniMax M2.7 SGLang 배포 가이드](https://github.com/MiniMax-AI/MiniMax-M2.7/blob/main/docs/sglang_deploy_guide.md)
+  - weights 약 220GB, KV cache 1M tokens당 약 240GB
+  - 4-GPU TP=4 명령과 최대 개별 sequence 약 196K
+- [MiniMax M2 vLLM recipe](https://github.com/vllm-project/recipes/blob/main/MiniMax/MiniMax-M2.md)
+  - 4×A100/A800/H100/H200 TP=4 지원
+- [demon-zombie/MiniMax-M2.7-AWQ-4bit](https://huggingface.co/demon-zombie/MiniMax-M2.7-AWQ-4bit)
+  - community W4A16, 현재 safetensors 약 119.8GB
+- [unsloth/MiniMax-M2.7-GGUF](https://huggingface.co/unsloth/MiniMax-M2.7-GGUF)
+  - UD-Q4_K_S 약 131.0GB
+- [MiniMax M2.7 LICENSE](https://github.com/MiniMax-AI/MiniMax-M2.7/blob/main/LICENSE)
+  - 개인 자체 호스팅·비상업 연구 허용
+  - 상업적 사용은 사전 서면 허가 필요
+
 ## DeepSeek
 
 - [deepseek-ai/DeepSeek-V4-Flash](https://huggingface.co/deepseek-ai/DeepSeek-V4-Flash)

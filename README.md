@@ -74,6 +74,7 @@ A100은 40GB와 80GB SKU 결과가 완전히 다르므로 별도로 계산했습
 - [Qwen3](https://huggingface.co/collections/Qwen/qwen3)
 - [Qwen3.5](https://huggingface.co/collections/Qwen/qwen35)
 - [Qwen3.6-27B](https://huggingface.co/Qwen/Qwen3.6-27B), [Qwen3.6-35B-A3B](https://huggingface.co/Qwen/Qwen3.6-35B-A3B)
+- [MiniMax-M2.7](https://huggingface.co/MiniMaxAI/MiniMax-M2.7)과 M2 계열
 - [Kimi K2.6](https://huggingface.co/moonshotai/Kimi-K2.6), [Kimi K2.7 Code](https://huggingface.co/moonshotai/Kimi-K2.7-Code), Kimi K3
 - [DeepSeek V4 Flash](https://huggingface.co/deepseek-ai/DeepSeek-V4-Flash), [V4 Pro](https://huggingface.co/deepseek-ai/DeepSeek-V4-Pro)
 - [GLM-5.2](https://huggingface.co/zai-org/GLM-5.2-FP8)
@@ -82,6 +83,7 @@ A100은 40GB와 80GB SKU 결과가 완전히 다르므로 별도로 계산했습
 
 ## 문서
 
+- [코딩 전용 GPU × 모델 선택표](docs/coding-matrix.md)
 - [전체 하드웨어 × 모델 가능 조건 매트릭스](docs/hardware-matrix.md)
 - [vLLM vs SGLang vs Ollama vs llama.cpp](docs/engine-selection.md)
 - [모델·양자화 카탈로그와 Hugging Face 링크](docs/model-options.md)
