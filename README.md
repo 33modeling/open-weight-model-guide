@@ -20,29 +20,34 @@
 | 8×A100 80GB | 640GB | HGX/NVSwitch | 397B INT4, 1T INT4 경계 |
 | 2×H100 80GB | 160GB | NVLink | 122B FP8, 235B INT4 |
 | 4×H100 80GB | 320GB | NVLink/NVSwitch | 397B INT4, V4 Flash |
-| 8×H100 80GB | 640GB | HGX/DGX NVSwitch | 397B FP8, Kimi K2.7 경계 |
+| 8×H100 80GB | 640GB | HGX/DGX NVSwitch | GLM-5.2 W4A8, Kimi K2.6/K2.7 INT4 경계 |
 | 16×H100 80GB | 1.28TB | 2 nodes + InfiniBand 권장 | V4 Pro, GLM-5.2 FP8 |
 
 A100은 40GB와 80GB SKU 결과가 완전히 다르므로 별도로 계산했습니다.
 
-## 구성별 1순위
+## 구성별 대표 시작점
 
-| 구성 | 1순위 모델 | 포맷 | 엔진 |
+“1순위”는 GPU 수만으로 정해지지 않습니다. 같은 구성에서도 단일 응답 품질, 지연시간, 총 처리량과 context 목표에 따라 모델·양자화·배치가 달라집니다.
+
+| 구성 | 목표 | 1순위 모델·포맷 | 엔진 |
 |---|---|---|---|
-| 2×2080 Ti | [Qwen3.6-27B](https://huggingface.co/Qwen/Qwen3.6-27B) | [GGUF Q4_K_M 약 16.8GB](https://huggingface.co/unsloth/Qwen3.6-27B-GGUF) | llama.cpp |
-| 2×4090 | [Qwen3.6-35B-A3B](https://huggingface.co/Qwen/Qwen3.6-35B-A3B) | [FP8 약 37.5GB](https://huggingface.co/Qwen/Qwen3.6-35B-A3B-FP8) | vLLM 또는 SGLang |
-| 2×A100 40GB | [Qwen3-32B](https://huggingface.co/Qwen/Qwen3-32B) | BF16 약 65.5GB | vLLM |
-| 4×A100 40GB | [Qwen3-235B-A22B](https://huggingface.co/Qwen/Qwen3-235B-A22B) | [GPTQ INT4 약 124.5GB](https://huggingface.co/Qwen/Qwen3-235B-A22B-GPTQ-Int4) | vLLM |
-| 8×A100 40GB | [Qwen3.5-397B-A17B](https://huggingface.co/Qwen/Qwen3.5-397B-A17B) | [GPTQ INT4 약 235.7GB](https://huggingface.co/Qwen/Qwen3.5-397B-A17B-GPTQ-Int4) | vLLM |
-| 2×A100 80GB | [Qwen3-235B-A22B](https://huggingface.co/Qwen/Qwen3-235B-A22B) | GPTQ INT4 | vLLM |
-| 4×A100 80GB | [Qwen3.5-397B-A17B](https://huggingface.co/Qwen/Qwen3.5-397B-A17B) | GPTQ INT4 | vLLM |
-| 8×A100 80GB | [Qwen3.5-397B-A17B](https://huggingface.co/Qwen/Qwen3.5-397B-A17B) | GPTQ INT4, 넓은 KV | vLLM/SGLang |
-| 2×H100 | [Qwen3.5-122B-A10B](https://huggingface.co/Qwen/Qwen3.5-122B-A10B) | [FP8 약 127.2GB](https://huggingface.co/Qwen/Qwen3.5-122B-A10B-FP8) | vLLM |
-| 4×H100 | [DeepSeek V4 Flash](https://huggingface.co/deepseek-ai/DeepSeek-V4-Flash) | FP4+FP8 약 159.6GB | SGLang 또는 vLLM |
-| 8×H100 | [Qwen3.5-397B-A17B](https://huggingface.co/Qwen/Qwen3.5-397B-A17B) | [FP8 약 406.2GB](https://huggingface.co/Qwen/Qwen3.5-397B-A17B-FP8) | vLLM/SGLang |
-| 16×H100 | [DeepSeek V4 Pro](https://huggingface.co/deepseek-ai/DeepSeek-V4-Pro) | FP4+FP8 약 864.7GB | SGLang 또는 vLLM multi-node |
+| 2×2080 Ti | 로컬 품질 | [Qwen3.6-27B Q4_K_M](https://huggingface.co/unsloth/Qwen3.6-27B-GGUF) | llama.cpp |
+| 2×4090 | 코딩·추론 품질 | [Qwen3.6-27B FP8](https://huggingface.co/Qwen/Qwen3.6-27B-FP8), 2 GPU 1 replica | vLLM/SGLang |
+| 2×4090 | 최대 총 처리량 | [35B-A3B Q3](https://huggingface.co/unsloth/Qwen3.6-35B-A3B-GGUF), GPU당 1 replica | llama.cpp |
+| 2×A100 40GB | 균형 | [Qwen3-32B](https://huggingface.co/Qwen/Qwen3-32B) BF16 | vLLM |
+| 4×A100 40GB | 최대 모델 | [Qwen3-235B-A22B GPTQ INT4](https://huggingface.co/Qwen/Qwen3-235B-A22B-GPTQ-Int4) | vLLM |
+| 8×A100 40GB | 최대 모델 | [Qwen3.5-397B-A17B GPTQ INT4](https://huggingface.co/Qwen/Qwen3.5-397B-A17B-GPTQ-Int4) | vLLM |
+| 2×A100 80GB | 최대 모델 | [Qwen3-235B-A22B GPTQ INT4](https://huggingface.co/Qwen/Qwen3-235B-A22B-GPTQ-Int4) | vLLM |
+| 4×A100 80GB | 최대 모델 | [Qwen3.5-397B-A17B GPTQ INT4](https://huggingface.co/Qwen/Qwen3.5-397B-A17B-GPTQ-Int4) | vLLM |
+| 8×A100 80GB | 균형·넓은 KV | [Qwen3.5-397B-A17B GPTQ INT4](https://huggingface.co/Qwen/Qwen3.5-397B-A17B-GPTQ-Int4) | vLLM/SGLang |
+| 2×H100 | 균형 | [Qwen3.5-122B-A10B FP8](https://huggingface.co/Qwen/Qwen3.5-122B-A10B-FP8) | vLLM |
+| 4×H100 | 최신 대형 MoE | [DeepSeek V4 Flash](https://huggingface.co/deepseek-ai/DeepSeek-V4-Flash) | SGLang/vLLM |
+| 8×H100 | 장문 context·코딩 | [GLM-5.2 W4A8](https://huggingface.co/PhalaCloud/GLM-5.2-W4AFP8) | SGLang |
+| 8×H100 | agentic coding·멀티모달 | [Kimi K2.6 Native INT4](https://huggingface.co/moonshotai/Kimi-K2.6), 적재 경계 | vLLM/SGLang |
+| 8×H100 | KV 여유·안정적 운영 | [Qwen3.5-397B-A17B FP8](https://huggingface.co/Qwen/Qwen3.5-397B-A17B-FP8) | vLLM/SGLang |
+| 16×H100 | 최대 모델 | [DeepSeek V4 Pro](https://huggingface.co/deepseek-ai/DeepSeek-V4-Pro) | SGLang/vLLM multi-node |
 
-이 표의 1순위는 “최대 파라미터”만으로 고르지 않았습니다. GPU 세대의 네이티브 정밀도, KV 캐시 여유, 통신 구조와 엔진 성숙도를 함께 고려했습니다.
+2×4090의 세부 선택은 [Qwen3.6 27B Dense vs 35B-A3B 결정표](docs/hardware-matrix.md#qwen36-27b-dense-vs-35b-a3b-결정표), 8×H100은 [목적별 결정표](docs/hardware-matrix.md#8h100)를 참고하세요. 각 행은 절대적인 순위가 아니라 workload별 시작점입니다.
 
 ## 엔진 선택 요약
 
@@ -69,7 +74,7 @@ A100은 40GB와 80GB SKU 결과가 완전히 다르므로 별도로 계산했습
 - [Qwen3](https://huggingface.co/collections/Qwen/qwen3)
 - [Qwen3.5](https://huggingface.co/collections/Qwen/qwen35)
 - [Qwen3.6-27B](https://huggingface.co/Qwen/Qwen3.6-27B), [Qwen3.6-35B-A3B](https://huggingface.co/Qwen/Qwen3.6-35B-A3B)
-- [Kimi K2.7 Code](https://huggingface.co/moonshotai/Kimi-K2.7-Code), Kimi K3
+- [Kimi K2.6](https://huggingface.co/moonshotai/Kimi-K2.6), [Kimi K2.7 Code](https://huggingface.co/moonshotai/Kimi-K2.7-Code), Kimi K3
 - [DeepSeek V4 Flash](https://huggingface.co/deepseek-ai/DeepSeek-V4-Flash), [V4 Pro](https://huggingface.co/deepseek-ai/DeepSeek-V4-Pro)
 - [GLM-5.2](https://huggingface.co/zai-org/GLM-5.2-FP8)
 - [gpt-oss-20b](https://huggingface.co/openai/gpt-oss-20b), [gpt-oss-120b](https://huggingface.co/openai/gpt-oss-120b)

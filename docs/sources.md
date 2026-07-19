@@ -24,10 +24,14 @@
 ## Qwen3.6
 
 - [Qwen/Qwen3.6-27B](https://huggingface.co/Qwen/Qwen3.6-27B)
+  - 27B dense, native context 262,144
+  - 35B-A3B와 같은 표에서 공개된 코딩·추론 벤치마크 비교
 - [Qwen/Qwen3.6-27B-FP8](https://huggingface.co/Qwen/Qwen3.6-27B-FP8)
 - [unsloth/Qwen3.6-27B-GGUF](https://huggingface.co/unsloth/Qwen3.6-27B-GGUF)
 - [Qwen/Qwen3.6-35B-A3B](https://huggingface.co/Qwen/Qwen3.6-35B-A3B)
+  - 전체 35B, 약 3B activated, native context 262,144
 - [Qwen/Qwen3.6-35B-A3B-FP8](https://huggingface.co/Qwen/Qwen3.6-35B-A3B-FP8)
+  - block size 128 fine-grained FP8, 원본과 거의 동일한 공식 성능 지표
 - [unsloth/Qwen3.6-35B-A3B-GGUF](https://huggingface.co/unsloth/Qwen3.6-35B-A3B-GGUF)
 
 ## Qwen3.5
@@ -59,6 +63,12 @@
   - 896 experts 중 16개 활성
   - MXFP4 weights, MXFP8 activations
   - 64개 이상 accelerator supernode 권장
+- [moonshotai/Kimi-K2.6](https://huggingface.co/moonshotai/Kimi-K2.6)
+  - 1T total, 32B activated, 256K context
+  - 공식 Native INT4 compressed-tensors, 현재 safetensors 약 595.2GB
+- [Kimi K2.6 공식 배포 가이드](https://huggingface.co/moonshotai/Kimi-K2.6/blob/main/docs/deploy_guidance.md)
+  - vLLM 0.19.1, SGLang 0.5.10.post1 이상
+  - 공식 예시는 8×H200 TP=8
 - [moonshotai/Kimi-K2.7-Code](https://huggingface.co/moonshotai/Kimi-K2.7-Code)
 - [Kimi K2.7 Code vLLM recipe](https://recipes.vllm.ai/moonshotai/Kimi-K2.7-Code)
 
@@ -74,6 +84,11 @@
 
 - [zai-org/GLM-5.2-FP8](https://huggingface.co/zai-org/GLM-5.2-FP8)
 - [PhalaCloud/GLM-5.2-W4AFP8](https://huggingface.co/PhalaCloud/GLM-5.2-W4AFP8)
+  - Hopper와 SGLang 0.5.13.post1 이상
+  - 8×H100에서 약 400K context, 8×H200에서 1M context
+  - 현재 safetensors 약 399.7GB
+- [nvidia/GLM-5.2-NVFP4](https://huggingface.co/nvidia/GLM-5.2-NVFP4)
+  - NVFP4는 Blackwell 최적화 경로이므로 H100 1순위에서 제외
 
 ## OpenAI gpt-oss
 

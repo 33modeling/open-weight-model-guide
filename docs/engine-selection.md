@@ -13,6 +13,30 @@
 | CPU+GPU offload | llama.cpp | Ollama |
 | 16×H100 multi-node | vLLM 또는 SGLang | workload 벤치마크로 결정 |
 
+### 2×RTX 4090 세부 선택
+
+| 목표 | 모델·배치 | 1순위 엔진 | 이유 |
+|---|---|---|---|
+| 27B FP8 품질 우선 단일 replica | PP=2 우선 | vLLM | OpenAI API, continuous batching, KV 관찰 |
+| 35B-A3B FP8 agent loop | PP=2 우선 | SGLang 또는 vLLM | prefix cache·구조화 출력과 실제 지연시간 비교 |
+| 35B-A3B Q3 최대 처리량 | GPU당 독립 replica | llama.cpp | GPU 간 PCIe 통신 제거 |
+| 27B Q4 품질 우선 2 replicas | GPU당 독립 replica | llama.cpp | GPU 지정과 context 제어가 명확 |
+| 개인용 한 줄 실행 | 한 GPU 또는 자동 분산 | Ollama | 설치·모델 관리가 가장 간단 |
+
+4090에는 NVLink가 없으므로 “두 GPU를 모두 쓴다”가 항상 빠르다는 뜻은 아닙니다. FP8 한 복제본은 PP=2와 TP=2를 비교하고, Q3/Q4가 한 GPU에 들어가면 독립 복제본을 먼저 사용합니다.
+
+### 8×H100 세부 선택
+
+| 모델·목표 | 1순위 엔진 | 조건 |
+|---|---|---|
+| GLM-5.2 W4A8 장문·코딩 | SGLang | 제작자가 0.5.13.post1 이상만 검증, `w4afp8`와 FP8 KV 사용 |
+| Kimi K2.6 Native INT4 | vLLM 또는 SGLang | vLLM 0.19.1/SGLang 0.5.10.post1 이상, TP=8 |
+| Kimi K2.7 Code | vLLM | 공식 recipe와 parser 우선 |
+| Qwen3.5-397B FP8 범용 서비스 | vLLM | 높은 동시성·continuous batching |
+| DeepSeek V4 Flash 복제본 2개 | SGLang 또는 vLLM | TP/EP=4 두 replica를 실제 workload로 비교 |
+
+GLM-5.2 W4A8은 현재 SGLang 전용 경로로 보는 것이 안전합니다. Kimi K2.6은 두 엔진 모두 공식 지원하지만 8×H100에서는 엔진보다 메모리 여유가 먼저 병목이므로, context 4K~8K와 concurrency 1에서 적재를 확인한 뒤 비교합니다. Ollama와 llama.cpp는 이 규모의 HGX 프로덕션 서빙 1순위가 아닙니다.
+
 ## 기능 비교
 
 | 항목 | vLLM | SGLang | Ollama | llama.cpp |
