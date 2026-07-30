@@ -73,6 +73,8 @@ weight_bytes = parameter_count × bits_per_weight ÷ 8
 | RTX 4090 | Ada, SM 8.9 | FP16/BF16, FP8, GPTQ/AWQ | NVLink 없음 |
 | A100 | Ampere, SM 8.0 | BF16/FP16, INT8/INT4, GPTQ/AWQ | FP8 Tensor Core 없음 |
 | H100 | Hopper, SM 9.0 | BF16/FP16, FP8, INT8 | FP4는 Blackwell 네이티브 경로와 다름 |
+| MI300X | CDNA 3 (gfx942) | BF16/FP16, FP8, INT8 | ROCm 스택 — CUDA 전용 kernel·양자화 경로 비호환 |
+| B300 | Blackwell Ultra | BF16/FP16, FP8, FP4/NVFP4/MXFP4 | FP4 네이티브 — NVFP4·MXFP4 체크포인트 1순위 |
 
 A100에서 FP8 체크포인트를 software fallback이나 weight-only kernel로 실행할 수 있어도 H100 FP8과 같은 연산 경로는 아닙니다.
 

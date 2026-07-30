@@ -49,6 +49,8 @@ A100은 40GB와 80GB SKU 결과가 완전히 다르므로 별도로 계산했습
 | 8×H100 | agentic coding·멀티모달 | [Kimi K2.6 Native INT4](https://huggingface.co/moonshotai/Kimi-K2.6), 적재 경계 | vLLM/SGLang |
 | 8×H100 | KV 여유·안정적 운영 | [Qwen3.5-397B-A17B FP8](https://huggingface.co/Qwen/Qwen3.5-397B-A17B-FP8) | vLLM/SGLang |
 | 16×H100 | 최대 모델 | [DeepSeek V4 Pro](https://huggingface.co/deepseek-ai/DeepSeek-V4-Pro) | SGLang/vLLM multi-node |
+| 8×MI300X | 대형 MoE FP8 여유 적재 | [GLM-5.2 FP8](https://huggingface.co/zai-org/GLM-5.2-FP8) 755.6GB | SGLang (공식 cookbook MI300X 지원) |
+| 8×B300 | 최대 모델 단일 노드 | [Kimi K3 MXFP4](https://huggingface.co/moonshotai/Kimi-K3) 1560.9GB | SGLang (공식 cookbook) |
 
 2×4090의 세부 선택은 [Qwen3.6 27B Dense vs 35B-A3B 결정표](docs/hardware-matrix.md#qwen36-27b-dense-vs-35b-a3b-결정표), 8×H100은 [목적별 결정표](docs/hardware-matrix.md#8h100)를 참고하세요. 각 행은 절대적인 순위가 아니라 workload별 시작점입니다.
 

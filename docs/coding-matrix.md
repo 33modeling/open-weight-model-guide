@@ -25,6 +25,7 @@
 | 8×A100 80GB | coding agent 총 처리량 | MiniMax-M2.7 | 공식 FP8 TP=4 replica 2개 | replica당 64K | SGLang/vLLM |
 | 8×A100 80GB | 단일 대형 모델 | [Qwen3.5-397B-A17B](https://huggingface.co/Qwen/Qwen3.5-397B-A17B-GPTQ-Int4) | GPTQ INT4 235.7GB, 넓은 KV | 64K | vLLM |
 | 2×H100 80GB | 균형 잡힌 코딩 | [Qwen3.5-122B-A10B](https://huggingface.co/Qwen/Qwen3.5-122B-A10B-FP8) | FP8 127.2GB, TP=2 | 32K | vLLM |
+| 2×H100 80GB | 장시간 agent loop 처리량 | [Laguna XS 2.1](https://huggingface.co/poolside/Laguna-XS-2.1) | BF16 66.9GB, GPU당 독립 replica | 16K~32K | 모델 카드 우선 |
 | 4×H100 80GB | coding agent | [MiniMax-M2.7](https://huggingface.co/MiniMaxAI/MiniMax-M2.7) | 공식 FP8 230.1GB, TP=4 | 64K~128K | SGLang/vLLM |
 | 8×H100 80GB | 장문 repository·코딩 | [GLM-5.2](https://huggingface.co/PhalaCloud/GLM-5.2-W4AFP8) | W4A8 399.7GB, TP=8 | 128K부터 | SGLang |
 | 8×H100 80GB | 코드 특화 최대 품질 | [Kimi K2.7 Code](https://huggingface.co/moonshotai/Kimi-K2.7-Code) | Native INT4 595.2GB, TP=8 경계 | 8K부터 | vLLM |
@@ -32,6 +33,8 @@
 | 16×H100 80GB | coding agent 처리량 | Kimi K2.7 Code | 8-GPU replica 2개 | replica당 32K부터 | vLLM |
 
 같은 GPU 구성에서 행이 여러 개인 이유는 코딩 정확도, 한 요청의 지연시간과 여러 agent의 총 처리량이 서로 다른 목표이기 때문입니다. 모델 제작사 벤치마크는 agent scaffold와 context가 다르므로 서로 완전히 같은 조건의 순위로 해석하지 않습니다.
+
+Laguna XS 2.1(2026-07-02 공개, 33B-A3B)은 장시간 로컬 agent 작업 특화 신규 옵션입니다. BF16 66.9GB라 80GB GPU 한 장에 그대로 들어가며 활성 3B라 loop 반복이 빠릅니다. 다만 이 저장소에서 서빙 구성을 아직 검증하지 않았으므로 배포 명령은 모델 카드를 우선합니다.
 
 ## 4×A100에서 MiniMax M2.7
 

@@ -39,6 +39,8 @@
 
 GLM-5.2 W4A8은 현재 SGLang 전용 경로로 보는 것이 안전합니다. Kimi K2.6은 두 엔진 모두 공식 지원하지만 8×H100에서는 엔진보다 메모리 여유가 먼저 병목이므로, context 4K~8K와 concurrency 1에서 적재를 확인한 뒤 비교합니다. Ollama와 llama.cpp는 이 규모의 HGX 프로덕션 서빙 1순위가 아닙니다.
 
+Kimi K3(공식 MXFP4 약 1.56TB)는 이 문서의 GPU 범위(≤16×H100)에는 적재가 불가합니다. H200 multi-node나 B200/B300급을 확보한 경우에만 [SGLang cookbook](https://docs.sglang.io/cookbook/autoregressive/Moonshotai/Kimi-K3)의 DSPARK speculative decoding·PD disaggregation 경로를 기준으로 엔진을 정합니다.
+
 ### 4×A100 MiniMax M2.7
 
 | 구성 | 체크포인트 | 1순위 엔진 | 이유 |

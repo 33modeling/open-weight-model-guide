@@ -35,6 +35,8 @@
 | 16×H100 80GB | DeepSeek V4 Pro, 2 nodes | [SGLang TP=16](sglang.md#16x-h100-deepseek-v4-pro), [vLLM TP=8+PP=2](vllm.md#16x-h100-deepseek-v4-pro) |
 | 16×H100 80GB | Kimi K2.7 Code 두 복제본 | [vLLM 8-GPU replica ×2](vllm.md#16x-h100-kimi-two-replicas) |
 
+이 인덱스는 ≤16×H100 범위만 다룹니다. 그보다 큰 모델(Kimi K3 공식 MXFP4 약 1.56TB 등)은 이 저장소의 스크립트 대신 [SGLang Kimi K3 cookbook](https://docs.sglang.io/cookbook/autoregressive/Moonshotai/Kimi-K3)과 [vLLM recipe](https://recipes.vllm.ai/moonshotai/Kimi-K3)를 출발점으로 사용합니다.
+
 DeepSeek V4 Flash는 체크포인트 파일이 약 159.6GB여도 H100에서 expert를 W4A16 경로로 실행합니다. 따라서 파일 크기만 보고 4×H100으로 정하지 않고, [SGLang 공식 cookbook](https://docs.sglang.io/cookbook/autoregressive/DeepSeek/DeepSeek-V4)의 검증 구성인 H100 TP=8을 따릅니다.
 
 ## 공통 사전 점검

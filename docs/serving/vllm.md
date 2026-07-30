@@ -17,6 +17,8 @@ vllm --version
 
 Qwen3.6은 vLLM 0.19.0 이상, Kimi K2.6/K2.7은 검증된 0.19.1 이상을 사용합니다. MiniMax와 DeepSeek V4는 최신 공식 recipe가 요구하는 kernel·fusion이 빠르게 바뀌므로 배포 전 연결된 recipe를 다시 확인합니다.
 
+GLM-5.2와 Kimi K3도 [vLLM recipe](https://recipes.vllm.ai/moonshotai/Kimi-K3)가 공개되어 있지만, 이 저장소가 검증한 8×H100 GLM-5.2 W4A8 경로는 SGLang 전용이고 K3는 ≤16×H100에 적재 자체가 불가하므로 이 문서에는 스크립트를 두지 않습니다.
+
 ```bash
 export API_KEY="${API_KEY:?set API_KEY first}"
 export HF_TOKEN="${HF_TOKEN:-}"
