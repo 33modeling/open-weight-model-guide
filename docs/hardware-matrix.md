@@ -182,7 +182,7 @@ H100은 FP8 Tensor Core를 제공하므로 공식 FP8 체크포인트의 우선�
 | [DeepSeek V3.2](https://huggingface.co/deepseek-ai/DeepSeek-V3.2), 689GB | ❌ | ❌ | INT4만 △ | ✅ |
 | [GLM-5.2 FP8](https://huggingface.co/zai-org/GLM-5.2-FP8), 755.6GB | ❌ | ❌ | ❌ | ✅ |
 | [DeepSeek V4 Pro](https://huggingface.co/deepseek-ai/DeepSeek-V4-Pro), 864.7GB | ❌ | ❌ | ❌ | ✅ |
-| Kimi K3 MXFP4, 이론 하한 1.4TB | ❌ | ❌ | ❌ | ❌ |
+| Kimi K3 MXFP4, 실제 1560.9GB | ❌ | ❌ | ❌ | ❌ |
 
 ### 2×H100
 
@@ -252,4 +252,4 @@ node 1: H100 × 8 ── TP=8 ┘
 - 동일한 컨테이너, CUDA/NCCL, 모델 경로
 - MoE는 SGLang EP 또는 vLLM EP를 실제 workload로 비교
 
-Kimi K3는 4bit 이론 하한만 약 1.4TB이므로 16×80GB의 1.28TB에도 GPU 단독 적재가 되지 않습니다. 공식 권장도 64개 이상 accelerator입니다.
+Kimi K3는 2026-07-27 공개된 공식 MXFP4 체크포인트가 약 1560.9GB이므로 16×80GB의 1.28TB에도 GPU 단독 적재가 되지 않습니다. 공식 권장은 64개 이상 accelerator이며, [SGLang cookbook](https://docs.sglang.io/cookbook/autoregressive/Moonshotai/Kimi-K3) 검증 하드웨어는 H100/H200 multi-node, B200/GB200, B300/GB300(단일 8×B300 = 2.3TB), MI350X/MI355X입니다. 이 문서 범위(≤16×H100)에서는 여전히 ❌입니다.

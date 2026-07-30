@@ -1,10 +1,10 @@
 # 멀티 GPU 오픈웨이트 LLM 배포 가이드
 
-2×RTX 2080 Ti부터 16×H100까지, GPU 구성별로 실행 가능한 오픈웨이트 모델과 양자화 포맷, 추론 엔진을 정리한 실무 가이드입니다.
+2×RTX 2080 Ti부터 16×H100, 8×MI300X·8×B300까지, GPU 구성별로 실행 가능한 오픈웨이트 모델과 양자화 포맷, 추론 엔진을 정리한 실무 가이드입니다.
 
-> 기준일: 2026-07-20
+> 기준일: 2026-07-20 (최근 갱신 2026-07-30)
 >
-> 범위: 추론 전용. 학습·파인튜닝 메모리는 포함하지 않습니다.
+> 범위: 추론 중심. 학습·파인튜닝 자원은 [학습 GPU 자원 산정](docs/training-sizing.md)에서 별도로 다룹니다.
 
 ## 포함된 하드웨어
 
@@ -22,8 +22,10 @@
 | 4×H100 80GB | 320GB | NVLink/NVSwitch | MiniMax-M2.7 FP8, 397B INT4 |
 | 8×H100 80GB | 640GB | HGX/DGX NVSwitch | GLM-5.2 W4A8, DeepSeek V4 Flash, Kimi K2.6/K2.7 INT4 경계 |
 | 16×H100 80GB | 1.28TB | 2 nodes + InfiniBand 권장 | V4 Pro, GLM-5.2 FP8 |
+| 8×MI300X 192GB | 1.54TB | OAM + Infinity Fabric | 대형 MoE FP8 여유 적재 (ROCm) |
+| 8×B300 288GB | 2.30TB | NVLink 5/NVSwitch | Kimi K3 MXFP4 단일 노드, GLM-5.2 NVFP4 |
 
-A100은 40GB와 80GB SKU 결과가 완전히 다르므로 별도로 계산했습니다.
+A100은 40GB와 80GB SKU 결과가 완전히 다르므로 별도로 계산했습니다. GPU 라인업은 계속 늘어나므로 새 GPU는 이 표와 [학습 GPU 자원 산정](docs/training-sizing.md)의 표에 행 단위로 추가합니다.
 
 ## 구성별 대표 시작점
 
@@ -76,11 +78,13 @@ A100은 40GB와 80GB SKU 결과가 완전히 다르므로 별도로 계산했습
 - [Qwen3.5](https://huggingface.co/collections/Qwen/qwen35)
 - [Qwen3.6-27B](https://huggingface.co/Qwen/Qwen3.6-27B), [Qwen3.6-35B-A3B](https://huggingface.co/Qwen/Qwen3.6-35B-A3B)
 - [MiniMax-M2.7](https://huggingface.co/MiniMaxAI/MiniMax-M2.7)과 M2 계열
-- [Kimi K2.6](https://huggingface.co/moonshotai/Kimi-K2.6), [Kimi K2.7 Code](https://huggingface.co/moonshotai/Kimi-K2.7-Code), Kimi K3
+- [Kimi K2.6](https://huggingface.co/moonshotai/Kimi-K2.6), [Kimi K2.7 Code](https://huggingface.co/moonshotai/Kimi-K2.7-Code), [Kimi K3](https://huggingface.co/moonshotai/Kimi-K3) (2026-07-27 오픈웨이트)
 - [DeepSeek V4 Flash](https://huggingface.co/deepseek-ai/DeepSeek-V4-Flash), [V4 Pro](https://huggingface.co/deepseek-ai/DeepSeek-V4-Pro)
 - [GLM-5.2](https://huggingface.co/zai-org/GLM-5.2-FP8)
 - [gpt-oss-20b](https://huggingface.co/openai/gpt-oss-20b), [gpt-oss-120b](https://huggingface.co/openai/gpt-oss-120b)
 - [Gemma 3 27B QAT](https://huggingface.co/google/gemma-3-27b-it-qat-q4_0-gguf)
+- [Laguna XS 2.1](https://huggingface.co/poolside/Laguna-XS-2.1) (agentic coding 33B-A3B)
+- [Nemotron-3-Super-120B-A12B NVFP4](https://huggingface.co/nvidia/NVIDIA-Nemotron-3-Super-120B-A12B-NVFP4) 외 Nemotron 3 계열
 
 ## 문서
 
@@ -93,6 +97,7 @@ A100은 40GB와 80GB SKU 결과가 완전히 다르므로 별도로 계산했습
   - [SGLang](docs/serving/sglang.md)
 - [모델·양자화 카탈로그와 Hugging Face 링크](docs/model-options.md)
 - [VRAM 계산법과 Kimi K3 분석](docs/memory-sizing.md)
+- [학습 GPU 자원 산정 — Qwen 7B·27B·35B](docs/training-sizing.md)
 - [공식 출처](docs/sources.md)
 
 ## 판정 기호

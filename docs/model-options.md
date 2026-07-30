@@ -14,7 +14,9 @@
 | Qwen3.6-27B | FP8 | 30.9GB | 2×4090 | [FP8](https://huggingface.co/Qwen/Qwen3.6-27B-FP8) |
 | Qwen3.6-35B-A3B | FP8 | 37.5GB | 2×4090 | [FP8](https://huggingface.co/Qwen/Qwen3.6-35B-A3B-FP8) |
 | Qwen3-32B | BF16 | 65.5GB | 2×A100 40GB | [공식](https://huggingface.co/Qwen/Qwen3-32B) |
+| Laguna XS 2.1 | BF16 (33B-A3B) | 66.9GB | 1×H100 또는 2×4090 양자화 | [공식](https://huggingface.co/poolside/Laguna-XS-2.1) |
 | Qwen3.5-122B-A10B | GPTQ INT4 | 78.9GB | 2×A100/H100 80GB | [INT4](https://huggingface.co/Qwen/Qwen3.5-122B-A10B-GPTQ-Int4) |
+| Nemotron-3-Super-120B-A12B | NVFP4 | 80.3GB | Blackwell 우선, Hopper는 W4A16 경로 확인 | [공식](https://huggingface.co/nvidia/NVIDIA-Nemotron-3-Super-120B-A12B-NVFP4) |
 | gpt-oss-120b | MXFP4 | 공식 H100 80GB 한 장 | 1×H100 또는 2×A100 | [공식](https://huggingface.co/openai/gpt-oss-120b) |
 | Qwen3-235B-A22B | GPTQ INT4 | 124.5GB | 2×80GB 또는 4×40GB | [INT4](https://huggingface.co/Qwen/Qwen3-235B-A22B-GPTQ-Int4) |
 | Qwen3.5-122B-A10B | FP8 | 127.2GB | 2×H100 | [FP8](https://huggingface.co/Qwen/Qwen3.5-122B-A10B-FP8) |
@@ -31,7 +33,7 @@
 | DeepSeek V3.2 | FP8 mixed | 689GB | 16×H100 | [공식](https://huggingface.co/deepseek-ai/DeepSeek-V3.2) |
 | GLM-5.2 | FP8 | 755.6GB | 16×H100 | [공식](https://huggingface.co/zai-org/GLM-5.2-FP8) |
 | DeepSeek V4 Pro | FP4+FP8 | 864.7GB | 16×H100 | [공식](https://huggingface.co/deepseek-ai/DeepSeek-V4-Pro) |
-| Kimi K3 | MXFP4 이론 하한 | 약 1.4TB | 공식 권장 64 accelerators | [공식 블로그](https://www.kimi.com/blog/kimi-k3) |
+| Kimi K3 | 공식 MXFP4 | 1560.9GB | 16×H200/8×B300급, 공식 권장 64 accelerators | [공식](https://huggingface.co/moonshotai/Kimi-K3) |
 
 ## Qwen3.6
 
@@ -224,14 +226,23 @@ Qwen3는 Qwen3.5/3.6보다 오래됐지만 dense와 MoE 크기 선택지가 넓�
 
 ### Kimi K3
 
-- 2.8T 파라미터
-- 896 experts 중 16개 활성
-- MXFP4 weights, MXFP8 activations
-- 1M context
+2026-07-27 오픈웨이트로 공개되었습니다.
+
+- 2.8T total, 활성 104B (896 experts 중 16개 + KDA·gated MLA)
+- 공식 체크포인트는 MXFP4 weights + MXFP8 activations의 QAT — 현재 safetensors 약 1560.9GB
+- 1M context, MoonViT-V2 vision encoder(401M) 내장
+- 라이선스: Kimi K3 License (HF `license:other`)
 - 공식 권장: 64개 이상 accelerator supernode
 
-MXFP4를 단순 4bit로 계산해도 1.4TB이므로 16×H100 80GB에도 들어가지 않습니다.
+가중치만 약 1.56TB이므로 16×H100 80GB(1.28TB)에는 들어가지 않습니다. SGLang cookbook은
+H100/H200(multi-node), B200/GB200, B300/GB300, MI350X/MI355X를 다루며, 단일 노드 후보는
+8×B300(2.3TB)·16×H200(2.25TB)급부터입니다. speculative decoding은 EAGLE이 아니라 전용
+DSPARK draft(`RadixArk/Kimi-K3-DSpark`)를 사용합니다. 장문 context recipe는 PP 활성화와
+DSPARK 비활성이 세트입니다.
 
+- [공식 체크포인트](https://huggingface.co/moonshotai/Kimi-K3)
+- [SGLang cookbook](https://docs.sglang.io/cookbook/autoregressive/Moonshotai/Kimi-K3)
+- [vLLM recipe](https://recipes.vllm.ai/moonshotai/Kimi-K3)
 - [Kimi K3 공식 블로그](https://www.kimi.com/blog/kimi-k3)
 
 ## MiniMax M2
@@ -303,6 +314,29 @@ MiniMax M2 계열은 약 230B total, 10B activated MoE이며 코딩 agent, tool 
 - [서드파티 W4A8](https://huggingface.co/PhalaCloud/GLM-5.2-W4AFP8)
 - [NVIDIA NVFP4](https://huggingface.co/nvidia/GLM-5.2-NVFP4) — B200/Blackwell 우선, SGLang 0.5.15에서 프로덕션 튜닝(8×B300 단일 사용자 500+ tok/s 보고)
 - [SGLang GLM-5.2 공식 cookbook](https://docs.sglang.io/cookbook/autoregressive/GLM/GLM-5.2) — BF16·FP8·NVFP4 경로, MTP preset, multi-node 구성 (W4A8은 미포함)
+
+## Laguna XS 2.1
+
+Poolside의 agentic coding 특화 MoE입니다 (2026-07-02 공개).
+
+- 33B total, 활성 3B
+- BF16 약 66.9GB — 1×H100/MI300X 적재, 4bit 양자화 시 24GB급 가능
+- 라이선스: OpenMDW-1.1
+- 장시간 로컬 agent 작업이 목표라 소형 GPU 코딩 용도에서 Qwen3.6-35B-A3B의 대안
+
+- [공식 체크포인트](https://huggingface.co/poolside/Laguna-XS-2.1)
+
+## Nemotron 3
+
+NVIDIA의 오픈 학습자료 공개 계열입니다. 배포 최적화 NVFP4 변형이 2026-07-06에 추가되었습니다.
+
+- Super 120B-A12B NVFP4: 약 80.3GB — NVFP4는 Blackwell 네이티브, Hopper는 W4A16 경로 여부를 배포 전 확인
+- Nano 30B-A3B BF16: 약 63.2GB — 1×H100/MI300X급
+- Ultra 550B-A55B도 BF16/NVFP4로 공개되어 있음
+
+- [Super 120B-A12B NVFP4](https://huggingface.co/nvidia/NVIDIA-Nemotron-3-Super-120B-A12B-NVFP4)
+- [Nano 30B-A3B BF16](https://huggingface.co/nvidia/NVIDIA-Nemotron-3-Nano-30B-A3B-BF16)
+- [Ultra 550B-A55B BF16](https://huggingface.co/nvidia/NVIDIA-Nemotron-3-Ultra-550B-A55B-BF16)
 
 ## gpt-oss
 

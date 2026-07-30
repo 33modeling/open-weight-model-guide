@@ -23,6 +23,7 @@ weight_bytes = parameter_count × bits_per_weight ÷ 8
 | Qwen3.5 397B FP8 | 약 397GB | 약 406.2GB |
 | Qwen3.5 397B GPTQ INT4 | 약 198.5GB | 약 235.7GB |
 | Qwen3.6 35B FP8 | 약 35GB | 약 37.5GB |
+| Kimi K3 MXFP4 | 약 1.40TB | 약 1.56TB |
 
 ## 2. 실용 가중치 예산
 
@@ -125,17 +126,26 @@ Kimi K3는 2.8T 파라미터입니다.
 | 1.5 | 525GB | 7장, 형식·품질 비현실적 |
 | 1.25 | 437.5GB | 6장, 형식·품질 비현실적 |
 
-공식 K3는 MXFP4 weights와 MXFP8 activations를 사용하고, 64개 이상 accelerator를 갖춘 supernode를 권장합니다.
+2026-07-27 공개된 [공식 오픈웨이트](https://huggingface.co/moonshotai/Kimi-K3)는 MXFP4 weights + MXFP8 activations(QAT)이고, 현재 safetensors 합계는 **약 1560.9GB**입니다. 이론 하한 1.4TB 대비 초과분은 scale·embedding·vision encoder(MoonViT-V2)와 일부 고정밀 레이어입니다. 공식 권장은 64개 이상 accelerator supernode입니다.
 
-16×H100은 명목상 1.28TB이므로 4bit 이론 하한 1.4TB에도 미치지 못합니다. 2bit 재양자화는 크기만 보면 들어가지만 검증된 K3 변환기, kernel과 품질 보장이 없습니다.
+16×H100은 명목상 1.28TB이므로 실제 1.56TB가 들어가지 않습니다. 2bit 재양자화는 크기만 보면 들어가지만 검증된 K3 변환기, kernel과 품질 보장이 없습니다.
 
-가능한 실험:
+단일 노드 GPU 적재가 성립하는 최소 구성:
+
+| 구성 | 명목 VRAM | 판정 |
+|---|---:|---|
+| 16×H100 80GB | 1.28TB | ❌ 가중치조차 불가 |
+| 8×MI300X 192GB | 1.54TB | ❌ 경계 미달 (runtime 공간 없음) |
+| 16×H200 141GB | 2.25TB | ✅ [SGLang cookbook](https://docs.sglang.io/cookbook/autoregressive/Moonshotai/Kimi-K3) 지원 (2-node) |
+| 8×B300 288GB | 2.30TB | ✅ cookbook 지원, 단일 노드 |
+
+가능한 실험(GPU 부족 시):
 
 - 16×H100 + CPU expert offload
 - 8×H100 + 1.5~2TB system RAM expert offload
 - 초저비트 2bit 이하 연구용 변환
 
-운영 권장안은 K3 API 또는 Kimi K2.7/Qwen/DeepSeek의 더 작은 체크포인트입니다.
+운영 권장안은 위 cookbook 검증 하드웨어, K3 API, 또는 Kimi K2.7/Qwen/DeepSeek의 더 작은 체크포인트입니다.
 
 ## 7. Context와 KV 캐시
 

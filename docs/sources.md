@@ -57,11 +57,15 @@
 
 ## Kimi
 
+- [moonshotai/Kimi-K3](https://huggingface.co/moonshotai/Kimi-K3) — 2026-07-27 오픈웨이트 공개
+  - 2.8T total, 활성 104B (896 experts 중 16개), KDA·gated MLA, MoonViT-V2 vision
+  - MXFP4 weights + MXFP8 activations QAT, 현재 safetensors 약 1560.9GB
+  - 1M context, 라이선스 Kimi K3 License
+- [SGLang Kimi K3 cookbook](https://docs.sglang.io/cookbook/autoregressive/Moonshotai/Kimi-K3)
+  - H100/H200·B200/GB200·B300/GB300·MI350X/MI355X, unified/prefill/decode 3모드
+  - speculative decoding은 DSPARK(`RadixArk/Kimi-K3-DSpark`), 장문 recipe는 PP 활성+DSPARK 비활성
+- [Kimi K3 vLLM recipe](https://recipes.vllm.ai/moonshotai/Kimi-K3)
 - [Kimi K3 공식 블로그](https://www.kimi.com/blog/kimi-k3)
-  - 2.8T
-  - 1M context
-  - 896 experts 중 16개 활성
-  - MXFP4 weights, MXFP8 activations
   - 64개 이상 accelerator supernode 권장
 - [moonshotai/Kimi-K2.6](https://huggingface.co/moonshotai/Kimi-K2.6)
   - 1T total, 32B activated, 256K context
@@ -115,6 +119,15 @@
 - [SGLang GLM-5.2 공식 cookbook](https://docs.sglang.io/cookbook/autoregressive/GLM/GLM-5.2)
   - 0.5.14부터 GLM-5.2 공식 지원, BF16·FP8·NVFP4와 MTP preset·multi-node 구성 (W4A8 미포함)
   - speculative decoding 활성 시 `--max-running-requests` 기본값 48 경고
+
+## Poolside · NVIDIA (2026-07 신규)
+
+- [poolside/Laguna-XS-2.1](https://huggingface.co/poolside/Laguna-XS-2.1)
+  - 33B-A3B MoE, agentic coding 특화, BF16 약 66.9GB, OpenMDW-1.1
+- [nvidia/NVIDIA-Nemotron-3-Super-120B-A12B-NVFP4](https://huggingface.co/nvidia/NVIDIA-Nemotron-3-Super-120B-A12B-NVFP4)
+  - 배포 최적화 NVFP4 약 80.3GB (2026-07-06), Blackwell 우선
+- [nvidia/NVIDIA-Nemotron-3-Nano-30B-A3B-BF16](https://huggingface.co/nvidia/NVIDIA-Nemotron-3-Nano-30B-A3B-BF16)
+  - 약 63.2GB
 
 ## OpenAI gpt-oss
 
