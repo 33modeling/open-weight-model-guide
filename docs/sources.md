@@ -109,8 +109,12 @@
   - Hopper와 SGLang 0.5.13.post1 이상
   - 8×H100에서 약 400K context, 8×H200에서 1M context
   - 현재 safetensors 약 399.7GB
+  - sampling 기본값(temperature 1.0·top_p 0.95)은 2026-07-07 추가, 체크포인트 최종 갱신 2026-07-21 — 구버전 로컬 캐시 주의
 - [nvidia/GLM-5.2-NVFP4](https://huggingface.co/nvidia/GLM-5.2-NVFP4)
   - NVFP4는 Blackwell 최적화 경로이므로 H100 1순위에서 제외
+- [SGLang GLM-5.2 공식 cookbook](https://docs.sglang.io/cookbook/autoregressive/GLM/GLM-5.2)
+  - 0.5.14부터 GLM-5.2 공식 지원, BF16·FP8·NVFP4와 MTP preset·multi-node 구성 (W4A8 미포함)
+  - speculative decoding 활성 시 `--max-running-requests` 기본값 48 경고
 
 ## OpenAI gpt-oss
 

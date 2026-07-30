@@ -31,7 +31,7 @@
 
 | 모델·목표 | 1순위 엔진 | 조건 |
 |---|---|---|
-| GLM-5.2 W4A8 장문·코딩 | SGLang | 제작자가 0.5.13.post1 이상만 검증, `w4afp8`와 FP8 KV 사용 |
+| GLM-5.2 W4A8 장문·코딩 | SGLang | 제작자가 0.5.13.post1 이상만 검증(0.5.14부터 GLM-5.2 공식 지원), `w4afp8`와 FP8 KV 사용 |
 | Kimi K2.6 Native INT4 | vLLM 또는 SGLang | vLLM 0.19.1/SGLang 0.5.10.post1 이상, TP=8 |
 | Kimi K2.7 Code | vLLM | 공식 recipe와 parser 우선 |
 | Qwen3.5-397B FP8 범용 서비스 | vLLM | 높은 동시성·continuous batching |

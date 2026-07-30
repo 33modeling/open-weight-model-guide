@@ -289,18 +289,20 @@ MiniMax M2 계열은 약 230B total, 10B activated MoE이며 코딩 agent, tool 
 
 - 753B
 - 공식 FP8: 약 755.6GB
-- 서드파티 W4A8: 약 399.7GB
+- 서드파티 W4A8: 약 399.7GB (safetensors 파일 합계 기준)
 - FP8은 16×H100
 - W4A8은 Hopper 전용이며 8×H100/H200에서 SGLang으로 실행
 - 제작자 기준 8×H100에서 가중치 적재 후 약 400K context 공간
 - 8×H200 실측: MTP 미사용 단일 stream 75 tok/s, EAGLE 사용 118 tok/s
-- W4A8은 SGLang 0.5.13.post1 이상만 검증됨
+- W4A8은 SGLang 0.5.13.post1 이상만 검증됨, GLM-5.2 자체는 0.5.14부터 SGLang 공식 지원
+- sampling 기본값(temperature 1.0·top_p 0.95)은 2026-07-07에야 W4A8 체크포인트에 추가됨 — 그 전에 받은 캐시는 재다운로드하거나 `top_p=0.95` 명시 (repetition loop 방지)
 
 8×H100에서는 FP8 원본이 들어가지 않으므로 W4A8이 현실적인 경로입니다. `w4afp8`, FP8 KV cache, TP=8을 사용하고, NVFP4 체크포인트는 Blackwell용이므로 H100의 1순위로 두지 않습니다. 서드파티 양자화인 만큼 코딩, tool call, 장문 context 회귀를 자체 workload로 확인해야 합니다.
 
 - [공식 FP8](https://huggingface.co/zai-org/GLM-5.2-FP8)
 - [서드파티 W4A8](https://huggingface.co/PhalaCloud/GLM-5.2-W4AFP8)
-- [NVIDIA NVFP4](https://huggingface.co/nvidia/GLM-5.2-NVFP4) — B200/Blackwell 우선
+- [NVIDIA NVFP4](https://huggingface.co/nvidia/GLM-5.2-NVFP4) — B200/Blackwell 우선, SGLang 0.5.15에서 프로덕션 튜닝(8×B300 단일 사용자 500+ tok/s 보고)
+- [SGLang GLM-5.2 공식 cookbook](https://docs.sglang.io/cookbook/autoregressive/GLM/GLM-5.2) — BF16·FP8·NVFP4 경로, MTP preset, multi-node 구성 (W4A8은 미포함)
 
 ## gpt-oss
 

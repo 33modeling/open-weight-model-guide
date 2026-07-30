@@ -13,7 +13,7 @@ uv pip install "sglang[all]"
 python -c 'import sglang; print(sglang.__version__)'
 ```
 
-Qwen3.6은 0.5.10 이상, Kimi K2.6은 0.5.10.post1 이상, GLM-5.2 W4A8은 0.5.13.post1 이상을 사용합니다. DeepSeek V4는 [공식 cookbook](https://docs.sglang.io/cookbook/autoregressive/DeepSeek/DeepSeek-V4)의 현재 image와 명령을 우선합니다.
+Qwen3.6은 0.5.10 이상, Kimi K2.6은 0.5.10.post1 이상, GLM-5.2 W4A8은 0.5.13.post1 이상을 사용합니다. GLM-5.2는 0.5.14부터 SGLang 공식 지원 모델이 되었으므로 신규 설치는 0.5.14 이상으로 시작합니다. DeepSeek V4는 [공식 cookbook](https://docs.sglang.io/cookbook/autoregressive/DeepSeek/DeepSeek-V4)의, GLM-5.2 원본 계열(BF16·FP8·NVFP4)은 [GLM-5.2 공식 cookbook](https://docs.sglang.io/cookbook/autoregressive/GLM/GLM-5.2)의 현재 image와 명령을 우선합니다.
 
 ```bash
 export API_KEY="${API_KEY:?set API_KEY first}"
@@ -137,7 +137,7 @@ python -m sglang.launch_server \
 
 ## 8x H100 GLM-5.2 W4A8
 
-[PhalaCloud/GLM-5.2-W4AFP8](https://huggingface.co/PhalaCloud/GLM-5.2-W4AFP8)의 공식 명령을 H100의 보수적 128K context 시작점으로 조정했습니다.
+[PhalaCloud/GLM-5.2-W4AFP8](https://huggingface.co/PhalaCloud/GLM-5.2-W4AFP8)의 공식 명령을 H100의 보수적 128K context 시작점으로 조정했습니다. [GLM-5.2 공식 cookbook](https://docs.sglang.io/cookbook/autoregressive/GLM/GLM-5.2)은 BF16·FP8·NVFP4 경로와 MTP preset, multi-node 구성을 다루지만 W4AFP8은 포함하지 않으므로, 이 체크포인트는 모델 카드 명령이 기준입니다.
 
 ```bash
 #!/usr/bin/env bash
@@ -165,6 +165,8 @@ exec python -m sglang.launch_server \
 
 체크포인트 제작자는 8×H100에서 약 400K context까지 가능하다고 설명하지만, 128K에서 실제 workload와 concurrency를 검증한 뒤 256K, 400K 순으로 올립니다.
 
+sampling 기본값(`generation_config.json`, temperature 1.0·top_p 0.95)은 2026-07-07에야 체크포인트에 추가되었습니다. 그 이전에 받아둔 로컬 캐시로 서빙하면 기본값이 비어 repetition loop가 날 수 있으므로, 체크포인트를 다시 받거나 요청마다 `top_p=0.95`를 명시합니다. 체크포인트는 2026-07-21에도 갱신되었으니 배포 전 로컬 캐시 revision을 HF와 대조합니다.
+
 EAGLE speculative decoding을 비교할 때만 다음을 추가합니다.
 
 ```bash
@@ -173,6 +175,8 @@ EAGLE speculative decoding을 비교할 때만 다음을 추가합니다.
 --speculative-eagle-topk 1 \
 --speculative-num-draft-tokens 2
 ```
+
+speculative decoding이 켜진 상태에서 `--max-running-requests`를 명시하지 않으면 기본값이 48로 잡힙니다([공식 cookbook](https://docs.sglang.io/cookbook/autoregressive/GLM/GLM-5.2) 경고). EAGLE 유무 비교가 동시성 차이로 왜곡되지 않도록 두 구성 모두 같은 값을 명시합니다.
 
 ## 8x H100 Kimi K2.6 or K2.7
 
