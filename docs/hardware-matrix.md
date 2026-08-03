@@ -212,6 +212,7 @@ DeepSeek V4 Flash는 파일 크기만 보면 4장에 들어가지만 H100의 원
 | 운영 안정성·KV 여유 | [Qwen3.5-397B-A17B](https://huggingface.co/Qwen/Qwen3.5-397B-A17B-FP8) | 406.2GB, FP8 | TP=8, 목표 context 측정 | vLLM/SGLang |
 | 최신 대형 MoE | [DeepSeek V4 Flash](https://huggingface.co/deepseek-ai/DeepSeek-V4-Flash) | 159.6GB on disk, Hopper W4A16 | 공식 H100 TP=8 경로 | SGLang |
 | coding agent 총 처리량 | [MiniMax-M2.7](https://huggingface.co/MiniMaxAI/MiniMax-M2.7) | 230.1GB, FP8 | TP=4 복제본 2개 | SGLang/vLLM |
+| 코딩·1M context·멀티모달 | [MiniMax-M3](https://huggingface.co/MiniMaxAI/MiniMax-M3) | 약 430GB, FP8 | TP=8, 잔여 ~200GB로 KV 확장 | SGLang/vLLM |
 
 GLM-5.2 W4A8은 “실험적으로 들어가는” 수준보다 조건이 명확합니다. 체크포인트 제작자는 Hopper와 SGLang 0.5.13.post1 이상을 요구하며(GLM-5.2 자체는 0.5.14부터 SGLang 공식 지원), 8×H100에서 가중치 적재 후 약 400K tokens 공간을 명시합니다. 8×H200 실측에서는 EAGLE MTP 사용 시 단일 stream 118 tok/s를 보고했습니다. H100 실제 속도는 별도로 측정해야 합니다. sampling 기본값은 2026-07-07에야 체크포인트에 추가되었으므로 그 전에 받은 캐시는 [serving 문서](serving/sglang.md#8x-h100-glm-52-w4a8)의 주의를 따릅니다.
 
@@ -223,7 +224,7 @@ Kimi K2.6은 공식 Native INT4 체크포인트 자체가 약 595.2GB입니다. 
 - vLLM은 0.19.1, SGLang은 0.5.10.post1 이상 공식 검증 경로 사용
 - 장문 context·동시성이 필요하면 GLM-5.2 W4A8, H200 또는 16×H100 선택
 
-따라서 8×H100의 기본 1순위는 하나가 아닙니다. 장문 context는 GLM-5.2 W4A8, Kimi 계열 agent 품질은 K2.6/K2.7 INT4 경계 구성, 최신 대형 MoE는 DeepSeek V4 Flash TP=8, 안정적인 서비스는 Qwen3.5-397B FP8, coding agent 총 처리량은 MiniMax-M2.7 TP=4 복제본 두 개가 우선입니다.
+따라서 8×H100의 기본 1순위는 하나가 아닙니다. 장문 context는 GLM-5.2 W4A8, Kimi 계열 agent 품질은 K2.6/K2.7 INT4 경계 구성, 최신 대형 MoE는 DeepSeek V4 Flash TP=8, 안정적인 서비스는 Qwen3.5-397B FP8, coding agent 총 처리량은 MiniMax-M2.7 TP=4 복제본 두 개가 우선입니다. 1M context·멀티모달 입력까지 한 모델로 필요하면 MiniMax-M3 FP8이 후보입니다.
 
 ### 16×H100
 
