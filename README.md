@@ -78,6 +78,7 @@ A100은 FP8 Tensor Core가 없으므로 BF16·INT4 경로를 우선합니다.
 | 장문 context·코딩 | [GLM-5.2 W4A8](https://huggingface.co/PhalaCloud/GLM-5.2-W4AFP8) | SGLang |
 | 최신 대형 MoE | [DeepSeek V4 Flash](https://huggingface.co/deepseek-ai/DeepSeek-V4-Flash), Hopper TP=8 | SGLang |
 | agentic coding·멀티모달 | [Kimi K2.6 Native INT4](https://huggingface.co/moonshotai/Kimi-K2.6), 적재 경계 | vLLM/SGLang |
+| 코딩 특화 대형 | [Kimi K2.7 Code Native INT4](https://huggingface.co/moonshotai/Kimi-K2.7-Code), 적재 경계 — 16×H100 권장 | vLLM/SGLang |
 | KV 여유·안정적 운영 | [Qwen3.5-397B-A17B FP8](https://huggingface.co/Qwen/Qwen3.5-397B-A17B-FP8) | vLLM/SGLang |
 
 최고 성능 한 개 픽과 순위: [best-pick 8×H100](docs/best-pick/8xh100.md) · 목적별 결정표: [hardware-matrix §8×H100](docs/hardware-matrix.md#8h100)
@@ -88,6 +89,8 @@ A100은 FP8 Tensor Core가 없으므로 BF16·INT4 경로를 우선합니다.
 |---|---|---|
 | 최대 모델 | [DeepSeek V4 Pro](https://huggingface.co/deepseek-ai/DeepSeek-V4-Pro) | SGLang/vLLM multi-node |
 | 무손실 FP8·초장문 KV | [GLM-5.2 FP8](https://huggingface.co/zai-org/GLM-5.2-FP8) 755.6GB — 품질만 보면 8×H100 W4A8로 충분, 16장은 KV·동시성 여유용 | SGLang/vLLM multi-node |
+| 코딩 agent 프로덕션 | [Kimi K2.7 Code Native INT4](https://huggingface.co/moonshotai/Kimi-K2.7-Code) 595.2GB — 공식 권장 구성 | vLLM/SGLang |
+| 구세대 대안 | [DeepSeek V3.2 FP8 mixed](https://huggingface.co/deepseek-ai/DeepSeek-V3.2) 689GB — V4 Pro로 대체 추세 | SGLang/vLLM multi-node |
 
 최고 성능 픽: [best-pick 16×H100](docs/best-pick/16xh100.md) — InfiniBand/GPUDirect RDMA 필요.
 
@@ -96,6 +99,9 @@ A100은 FP8 Tensor Core가 없으므로 BF16·INT4 경로를 우선합니다.
 | 목표 | 1순위 모델·포맷 | 엔진 |
 |---|---|---|
 | 대형 MoE FP8 여유 적재 | [GLM-5.2 FP8](https://huggingface.co/zai-org/GLM-5.2-FP8) 755.6GB | SGLang (공식 cookbook MI300X 지원) |
+| 최대 모델 (조건부) | [DeepSeek V4 Pro](https://huggingface.co/deepseek-ai/DeepSeek-V4-Pro) 864.7GB — FP4 경로 ROCm 검증 필요 | SGLang |
+| 코딩 agent (조건부) | [Kimi K2.6](https://huggingface.co/moonshotai/Kimi-K2.6)/[K2.7 Code](https://huggingface.co/moonshotai/Kimi-K2.7-Code) Native INT4 595.2GB — ROCm INT4 kernel 확인 | vLLM/SGLang |
+| FP8 안전 경로 | [DeepSeek V3.2 FP8 mixed](https://huggingface.co/deepseek-ai/DeepSeek-V3.2) 689GB | SGLang |
 
 최고 성능 픽: [best-pick 8×MI300X](docs/best-pick/8xmi300x.md) — FP4·CUDA 전용 양자화 경로 비호환 주의.
 
@@ -104,6 +110,7 @@ A100은 FP8 Tensor Core가 없으므로 BF16·INT4 경로를 우선합니다.
 | 목표 | 1순위 모델·포맷 | 엔진 |
 |---|---|---|
 | 최대 모델 단일 노드 | [Kimi K3 MXFP4](https://huggingface.co/moonshotai/Kimi-K3) 1560.9GB | SGLang (공식 cookbook) |
+| 고효율 FP4 대형 MoE | [GLM-5.2 NVFP4](https://huggingface.co/nvidia/GLM-5.2-NVFP4) | SGLang/TensorRT-LLM |
 
 ## 엔진 선택 요약
 
