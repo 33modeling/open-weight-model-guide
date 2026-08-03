@@ -87,6 +87,7 @@ A100은 FP8 Tensor Core가 없으므로 BF16·INT4 경로를 우선합니다.
 | 목표 | 1순위 모델·포맷 | 엔진 |
 |---|---|---|
 | 최대 모델 | [DeepSeek V4 Pro](https://huggingface.co/deepseek-ai/DeepSeek-V4-Pro) | SGLang/vLLM multi-node |
+| 무손실 FP8·초장문 KV | [GLM-5.2 FP8](https://huggingface.co/zai-org/GLM-5.2-FP8) 755.6GB — 품질만 보면 8×H100 W4A8로 충분, 16장은 KV·동시성 여유용 | SGLang/vLLM multi-node |
 
 최고 성능 픽: [best-pick 16×H100](docs/best-pick/16xh100.md) — InfiniBand/GPUDirect RDMA 필요.
 
