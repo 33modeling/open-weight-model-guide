@@ -175,3 +175,10 @@ Hugging Face Hub API의 현재 `siblings[].size` 중 `.safetensors`와 `.gguf` �
 - Kimi K3는 아직 실제 체크포인트 크기 대신 파라미터 × bits 이론 하한 사용
 
 파일 크기는 실제 GPU resident memory와 정확히 같지 않습니다. engine loader가 임시 buffer나 변환된 tensor를 추가로 만들 수 있습니다.
+
+## MiniMax M3 (2026-08-03 추가)
+
+- [MiniMaxAI/MiniMax-M3 — Hugging Face](https://huggingface.co/MiniMaxAI/MiniMax-M3)
+- [Artificial Analysis — MiniMax-M3 분석](https://artificialanalysis.ai/articles/minimax-m3)
+- [morphllm — M3 스펙 정리 (428B MoE·1M context·멀티모달)](https://www.morphllm.com/minimax-m3)
+- 자사 보고 벤치마크(SWE-bench Pro 59.0)는 교차 검증 전 참고치로 취급

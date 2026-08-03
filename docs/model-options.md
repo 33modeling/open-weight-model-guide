@@ -27,6 +27,7 @@
 | Qwen3.5-397B-A17B | GPTQ INT4 | 235.7GB | 4×80GB 또는 8×40GB | [INT4](https://huggingface.co/Qwen/Qwen3.5-397B-A17B-GPTQ-Int4) |
 | Qwen3-235B-A22B | FP8 | 239.0GB | 4×H100 | [FP8](https://huggingface.co/Qwen/Qwen3-235B-A22B-FP8) |
 | GLM-5.2 | 서드파티 W4A8 | 399.7GB | 8×H100 | [W4A8](https://huggingface.co/PhalaCloud/GLM-5.2-W4AFP8) |
+| MiniMax-M3 | 공식 FP8 | 약 430GB | 8×H100 (KV 여유 ~200GB) | [공식](https://huggingface.co/MiniMaxAI/MiniMax-M3) |
 | Qwen3.5-397B-A17B | FP8 | 406.2GB | 8×H100 | [FP8](https://huggingface.co/Qwen/Qwen3.5-397B-A17B-FP8) |
 | Kimi K2.6 | 공식 Native INT4 | 595.2GB | 8×H100 경계, H200 권장 | [공식](https://huggingface.co/moonshotai/Kimi-K2.6) |
 | Kimi K2.7 Code | Native INT4 | 595.2GB | 8×H100 경계, 16×H100 권장 | [공식](https://huggingface.co/moonshotai/Kimi-K2.7-Code) |
@@ -248,6 +249,14 @@ DSPARK 비활성이 세트입니다.
 ## MiniMax M2
 
 MiniMax M2 계열은 약 230B total, 10B activated MoE이며 코딩 agent, tool use와 repository 작업에 초점을 둡니다. M2/M2.1/M2.5/M2.7의 현재 공식 체크포인트는 모두 약 230.1GB이고 같은 SGLang/vLLM 배포 가이드를 사용합니다.
+
+## MiniMax M3
+
+MiniMax M3(2026-06 공개)는 428B total, 약 23B activated MoE로, 오픈웨이트 최초로 frontier급 코딩 + 1M context + 네이티브 이미지·비디오 입력을 한 모델에 담았다고 주장합니다. MSA 구조로 1M context에서 prefill 약 9× 가속을 보고합니다.
+
+- 공식 FP8: 약 430GB — 8×H100 적재, 잔여 ~200GB로 1M context KV 운용
+- 벤치마크(자사 보고): SWE-bench Pro 59.0 — 자사 인프라 측정이므로 교차 검증 전 참고치
+- [공식 체크포인트](https://huggingface.co/MiniMaxAI/MiniMax-M3)
 
 ### MiniMax M2.7
 
