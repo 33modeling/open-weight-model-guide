@@ -29,95 +29,99 @@ A100은 40GB와 80GB SKU 결과가 완전히 다르므로 별도로 계산했습
 
 ## 구성별 대표 시작점
 
-“1순위”는 GPU 수만으로 정해지지 않습니다. 같은 구성에서도 단일 응답 품질, 지연시간, 총 처리량과 context 목표에 따라 모델·양자화·배치가 달라집니다. 아래는 GPU 구성별로 나눈 시작점 표이며, 각 행은 절대 순위가 아니라 workload별 시작점입니다.
+“1순위”는 GPU 수만으로 정해지지 않습니다. 같은 구성에서도 단일 응답 품질, 지연시간, 총 처리량과 context 목표에 따라 모델·양자화·배치가 달라집니다. 각 행은 절대 순위가 아니라 workload별 시작점입니다.
 
-### 2×RTX 2080 Ti 11GB
+### 2×RTX 2080 Ti 11GB — 22GB
 
-| 목표 | 1순위 모델·포맷 | 엔진 |
-|---|---|---|
-| 로컬 품질 | [Qwen3.6-27B Q4_K_M](https://huggingface.co/unsloth/Qwen3.6-27B-GGUF) | llama.cpp |
+| 목표 | 모델 | 포맷 · 가중치 | 엔진 |
+|---|---|---|---|
+| 로컬 품질 | [Qwen3.6-27B](https://huggingface.co/unsloth/Qwen3.6-27B-GGUF) | GGUF Q4_K_M · 16.8GB | llama.cpp |
 
-### 2×RTX 4090 24GB
+### 2×RTX 4090 24GB — 48GB
 
-| 목표 | 1순위 모델·포맷 | 엔진 |
-|---|---|---|
-| 코딩·추론 품질 | [Qwen3.6-27B FP8](https://huggingface.co/Qwen/Qwen3.6-27B-FP8), 2 GPU 1 replica | vLLM/SGLang |
-| 최대 총 처리량 | [35B-A3B Q3](https://huggingface.co/unsloth/Qwen3.6-35B-A3B-GGUF), GPU당 1 replica | llama.cpp |
+| 목표 | 모델 | 포맷 · 가중치 | 엔진 |
+|---|---|---|---|
+| 코딩·추론 품질 | [Qwen3.6-27B](https://huggingface.co/Qwen/Qwen3.6-27B-FP8) | FP8 · 30.9GB · TP=2 | vLLM/SGLang |
+| 최대 총 처리량 | [Qwen3.6-35B-A3B](https://huggingface.co/unsloth/Qwen3.6-35B-A3B-GGUF) | GGUF Q3 · GPU당 1 replica | llama.cpp |
 
-세부 선택: [Qwen3.6 27B Dense vs 35B-A3B 결정표](docs/hardware-matrix.md#qwen36-27b-dense-vs-35b-a3b-결정표)
+- 세부 선택: [27B Dense vs 35B-A3B 결정표](docs/hardware-matrix.md#qwen36-27b-dense-vs-35b-a3b-결정표)
 
 ### A100 40GB (2·4·8장)
 
-| 장수 | 목표 | 1순위 모델·포맷 | 엔진 |
-|---:|---|---|---|
-| 2 | 균형 | [Qwen3-32B](https://huggingface.co/Qwen/Qwen3-32B) BF16 | vLLM |
-| 2 | 코딩 품질 (최신 dense) | [Qwen3.6-27B](https://huggingface.co/Qwen/Qwen3.6-27B) BF16 55.6GB, TP=2 | vLLM |
-| 4 | 최대 모델 | [Qwen3-235B-A22B GPTQ INT4](https://huggingface.co/Qwen/Qwen3-235B-A22B-GPTQ-Int4) | vLLM |
-| 8 | 최대 모델 | [Qwen3.5-397B-A17B GPTQ INT4](https://huggingface.co/Qwen/Qwen3.5-397B-A17B-GPTQ-Int4) | vLLM |
+| 장수 | 목표 | 모델 | 포맷 · 가중치 | 엔진 |
+|---:|---|---|---|---|
+| 2 | 균형 | [Qwen3-32B](https://huggingface.co/Qwen/Qwen3-32B) | BF16 · 66.9GB | vLLM |
+| 2 | 코딩 품질 | [Qwen3.6-27B](https://huggingface.co/Qwen/Qwen3.6-27B) | BF16 · 55.6GB · TP=2 | vLLM |
+| 4 | 최대 모델 | [Qwen3-235B-A22B](https://huggingface.co/Qwen/Qwen3-235B-A22B-GPTQ-Int4) | GPTQ INT4 · 239GB급 | vLLM |
+| 8 | 최대 모델 | [Qwen3.5-397B-A17B](https://huggingface.co/Qwen/Qwen3.5-397B-A17B-GPTQ-Int4) | GPTQ INT4 · 235.7GB | vLLM |
 
 ### A100 80GB (2·4·8장)
 
-| 장수 | 목표 | 1순위 모델·포맷 | 엔진 |
-|---:|---|---|---|
-| 2 | 최대 모델 | [Qwen3-235B-A22B GPTQ INT4](https://huggingface.co/Qwen/Qwen3-235B-A22B-GPTQ-Int4) | vLLM |
-| 2 | 품질 + 2 replicas | [Qwen3.6-27B](https://huggingface.co/Qwen/Qwen3.6-27B) BF16, GPU당 1 replica | vLLM |
-| 4 | 최대 모델 | [Qwen3.5-397B-A17B GPTQ INT4](https://huggingface.co/Qwen/Qwen3.5-397B-A17B-GPTQ-Int4) | vLLM |
-| 4 | coding agent | [MiniMax-M2.7](https://huggingface.co/MiniMaxAI/MiniMax-M2.7) 공식 FP8 230.1GB (A100은 weight-only 경로) | vLLM |
-| 8 | 균형·넓은 KV | [Qwen3.5-397B-A17B GPTQ INT4](https://huggingface.co/Qwen/Qwen3.5-397B-A17B-GPTQ-Int4) | vLLM/SGLang |
+| 장수 | 목표 | 모델 | 포맷 · 가중치 | 엔진 |
+|---:|---|---|---|---|
+| 2 | 최대 모델 | [Qwen3-235B-A22B](https://huggingface.co/Qwen/Qwen3-235B-A22B-GPTQ-Int4) | GPTQ INT4 | vLLM |
+| 2 | 품질 + 2 replicas | [Qwen3.6-27B](https://huggingface.co/Qwen/Qwen3.6-27B) | BF16 · GPU당 1 replica | vLLM |
+| 4 | 최대 모델 | [Qwen3.5-397B-A17B](https://huggingface.co/Qwen/Qwen3.5-397B-A17B-GPTQ-Int4) | GPTQ INT4 · 235.7GB | vLLM |
+| 4 | coding agent | [MiniMax-M2.7](https://huggingface.co/MiniMaxAI/MiniMax-M2.7) | 공식 FP8 · 230.1GB¹ | vLLM |
+| 8 | 균형·넓은 KV | [Qwen3.5-397B-A17B](https://huggingface.co/Qwen/Qwen3.5-397B-A17B-GPTQ-Int4) | GPTQ INT4 · 235.7GB | vLLM/SGLang |
 
-A100은 FP8 Tensor Core가 없으므로 BF16·INT4 경로를 우선합니다.
+- ¹ A100은 FP8 Tensor Core가 없어 weight-only 경로. BF16·INT4를 우선합니다.
 
-### 2×·4×H100 80GB
+### H100 80GB (2·4장)
 
-| 장수 | 목표 | 1순위 모델·포맷 | 엔진 |
-|---:|---|---|---|
-| 2 | 균형 | [Qwen3.5-122B-A10B FP8](https://huggingface.co/Qwen/Qwen3.5-122B-A10B-FP8) | vLLM |
-| 2 | 코딩 품질·복제 유연성 | [Qwen3.6-27B FP8](https://huggingface.co/Qwen/Qwen3.6-27B-FP8) 30.9GB, GPU당 1 replica | vLLM/SGLang |
-| 4 | agent loop 속도 | [Qwen3.6-35B-A3B FP8](https://huggingface.co/Qwen/Qwen3.6-35B-A3B-FP8) 37.5GB, GPU당 1 replica | vLLM/SGLang |
-| 4 | coding agent | [MiniMax-M2.7 FP8](https://huggingface.co/MiniMaxAI/MiniMax-M2.7) | SGLang/vLLM |
+| 장수 | 목표 | 모델 | 포맷 · 가중치 | 엔진 |
+|---:|---|---|---|---|
+| 2 | 균형 | [Qwen3.5-122B-A10B](https://huggingface.co/Qwen/Qwen3.5-122B-A10B-FP8) | FP8 | vLLM |
+| 2 | 코딩 품질·복제 유연성 | [Qwen3.6-27B](https://huggingface.co/Qwen/Qwen3.6-27B-FP8) | FP8 · 30.9GB · GPU당 1 replica | vLLM/SGLang |
+| 4 | coding agent | [MiniMax-M2.7](https://huggingface.co/MiniMaxAI/MiniMax-M2.7) | FP8 · 230.1GB | SGLang/vLLM |
+| 4 | agent loop 속도 | [Qwen3.6-35B-A3B](https://huggingface.co/Qwen/Qwen3.6-35B-A3B-FP8) | FP8 · 37.5GB · GPU당 1 replica | vLLM/SGLang |
 
-### 8×H100 80GB — 명목 640GB
+### 8×H100 80GB — 640GB
 
-| 목표 | 1순위 모델·포맷 | 엔진 |
-|---|---|---|
-| 장문 context·코딩 | [GLM-5.2 W4A8](https://huggingface.co/PhalaCloud/GLM-5.2-W4AFP8) | SGLang |
-| 최신 대형 MoE | [DeepSeek V4 Flash](https://huggingface.co/deepseek-ai/DeepSeek-V4-Flash), Hopper TP=8 | SGLang |
-| agentic coding·멀티모달 | [Kimi K2.6 Native INT4](https://huggingface.co/moonshotai/Kimi-K2.6), 적재 경계 | vLLM/SGLang |
-| 코딩 특화 대형 | [Kimi K2.7 Code Native INT4](https://huggingface.co/moonshotai/Kimi-K2.7-Code), 적재 경계 — 16×H100 권장 | vLLM/SGLang |
-| KV 여유·안정적 운영 | [Qwen3.5-397B-A17B FP8](https://huggingface.co/Qwen/Qwen3.5-397B-A17B-FP8) | vLLM/SGLang |
-| 고동시성 소형 서빙 | [Qwen3.6-27B FP8](https://huggingface.co/Qwen/Qwen3.6-27B-FP8) × GPU당 1 replica(8개) — SWE-bench V 77.2로 소형 중 최상 | vLLM |
-| coding agent·KV 대여유 | [MiniMax-M2.7 FP8](https://huggingface.co/MiniMaxAI/MiniMax-M2.7) 230.1GB — 잔여 ~400GB로 초장문·고동시성 | SGLang/vLLM |
+| 목표 | 모델 | 포맷 · 가중치 | 엔진 |
+|---|---|---|---|
+| 최고 품질 (권장 픽) | [GLM-5.2](https://huggingface.co/PhalaCloud/GLM-5.2-W4AFP8) | W4A8 · 399.7GB | SGLang |
+| 코딩·1M context·멀티모달 | [MiniMax-M3](https://huggingface.co/MiniMaxAI/MiniMax-M3) | FP8 · 약 430GB² | SGLang/vLLM |
+| 최신 대형 MoE·처리량 | [DeepSeek V4 Flash](https://huggingface.co/deepseek-ai/DeepSeek-V4-Flash) | FP4+FP8 · 159.6GB · TP=8 | SGLang |
+| agentic coding·멀티모달 | [Kimi K2.6](https://huggingface.co/moonshotai/Kimi-K2.6) | Native INT4 · 595.2GB · 적재 경계 | vLLM/SGLang |
+| 코딩 특화 대형 | [Kimi K2.7 Code](https://huggingface.co/moonshotai/Kimi-K2.7-Code) | Native INT4 · 595.2GB · 경계, 16장 권장 | vLLM/SGLang |
+| KV 여유·안정 운영 | [Qwen3.5-397B-A17B](https://huggingface.co/Qwen/Qwen3.5-397B-A17B-FP8) | FP8 · 406.2GB | vLLM/SGLang |
+| coding agent·KV 대여유 | [MiniMax-M2.7](https://huggingface.co/MiniMaxAI/MiniMax-M2.7) | FP8 · 230.1GB | SGLang/vLLM |
+| 고동시성 소형 서빙 | [Qwen3.6-27B](https://huggingface.co/Qwen/Qwen3.6-27B-FP8) | FP8 · GPU당 1 replica × 8 | vLLM |
 
-최고 성능 한 개 픽과 순위: [best-pick 8×H100](docs/best-pick/8xh100.md) · 목적별 결정표: [hardware-matrix §8×H100](docs/hardware-matrix.md#8h100)
+- ² MiniMax-M3: 428B/활성 23B, 1M context, 네이티브 이미지·비디오 입력. 자사 보고 SWE-bench Pro 59.0.
+- 최고 성능 한 개 픽·순위: [best-pick 8×H100](docs/best-pick/8xh100.md) · 목적별 결정표: [hardware-matrix §8×H100](docs/hardware-matrix.md#8h100)
 
-### 16×H100 80GB — 명목 1.28TB, 2노드
+### 16×H100 80GB — 1.28TB, 2노드
 
-| 목표 | 1순위 모델·포맷 | 엔진 |
-|---|---|---|
-| 최대 모델 | [DeepSeek V4 Pro](https://huggingface.co/deepseek-ai/DeepSeek-V4-Pro) | SGLang/vLLM multi-node |
-| 무손실 FP8·초장문 KV | [GLM-5.2 FP8](https://huggingface.co/zai-org/GLM-5.2-FP8) 755.6GB — 품질만 보면 8×H100 W4A8로 충분, 16장은 KV·동시성 여유용 | SGLang/vLLM multi-node |
-| 코딩 agent 프로덕션 | [Kimi K2.7 Code Native INT4](https://huggingface.co/moonshotai/Kimi-K2.7-Code) 595.2GB — 공식 권장 구성 | vLLM/SGLang |
-| 구세대 대안 | [DeepSeek V3.2 FP8 mixed](https://huggingface.co/deepseek-ai/DeepSeek-V3.2) 689GB — V4 Pro로 대체 추세 | SGLang/vLLM multi-node |
+| 목표 | 모델 | 포맷 · 가중치 | 엔진 |
+|---|---|---|---|
+| 최대 모델 (권장 픽) | [DeepSeek V4 Pro](https://huggingface.co/deepseek-ai/DeepSeek-V4-Pro) | FP4+FP8 · 864.7GB | SGLang/vLLM multi-node |
+| 무손실 FP8·초장문 KV | [GLM-5.2](https://huggingface.co/zai-org/GLM-5.2-FP8) | 공식 FP8 · 755.6GB³ | SGLang/vLLM multi-node |
+| 코딩 agent 프로덕션 | [Kimi K2.7 Code](https://huggingface.co/moonshotai/Kimi-K2.7-Code) | Native INT4 · 595.2GB · 공식 권장 구성 | vLLM/SGLang |
+| 구세대 대안 | [DeepSeek V3.2](https://huggingface.co/deepseek-ai/DeepSeek-V3.2) | FP8 mixed · 689GB | SGLang/vLLM multi-node |
 
-최고 성능 픽: [best-pick 16×H100](docs/best-pick/16xh100.md) — InfiniBand/GPUDirect RDMA 필요.
+- ³ 품질만 보면 8×H100 W4A8로 충분 — 16장 FP8은 양자화 배제 정책이나 KV·동시성 여유가 목적일 때.
+- 최고 성능 픽: [best-pick 16×H100](docs/best-pick/16xh100.md) — InfiniBand/GPUDirect RDMA 필요.
 
-### 8×MI300X 192GB — 명목 1.54TB, ROCm
+### 8×MI300X 192GB — 1.54TB, ROCm
 
-| 목표 | 1순위 모델·포맷 | 엔진 |
-|---|---|---|
-| 대형 MoE FP8 여유 적재 | [GLM-5.2 FP8](https://huggingface.co/zai-org/GLM-5.2-FP8) 755.6GB | SGLang (공식 cookbook MI300X 지원) |
-| 최대 모델 (조건부) | [DeepSeek V4 Pro](https://huggingface.co/deepseek-ai/DeepSeek-V4-Pro) 864.7GB — FP4 경로 ROCm 검증 필요 | SGLang |
-| 코딩 agent (조건부) | [Kimi K2.6](https://huggingface.co/moonshotai/Kimi-K2.6)/[K2.7 Code](https://huggingface.co/moonshotai/Kimi-K2.7-Code) Native INT4 595.2GB — ROCm INT4 kernel 확인 | vLLM/SGLang |
-| FP8 안전 경로 | [DeepSeek V3.2 FP8 mixed](https://huggingface.co/deepseek-ai/DeepSeek-V3.2) 689GB | SGLang |
+| 목표 | 모델 | 포맷 · 가중치 | 엔진 |
+|---|---|---|---|
+| 대형 MoE FP8 (권장 픽) | [GLM-5.2](https://huggingface.co/zai-org/GLM-5.2-FP8) | 공식 FP8 · 755.6GB | SGLang (공식 cookbook) |
+| 코딩·1M·멀티모달 | [MiniMax-M3](https://huggingface.co/MiniMaxAI/MiniMax-M3) | FP8 · 약 430GB | SGLang |
+| 최대 모델 (조건부) | [DeepSeek V4 Pro](https://huggingface.co/deepseek-ai/DeepSeek-V4-Pro) | FP4+FP8 · 864.7GB⁴ | SGLang |
+| 코딩 agent (조건부) | [Kimi K2.6](https://huggingface.co/moonshotai/Kimi-K2.6) · [K2.7 Code](https://huggingface.co/moonshotai/Kimi-K2.7-Code) | Native INT4 · 595.2GB⁴ | vLLM/SGLang |
+| FP8 안전 경로 | [DeepSeek V3.2](https://huggingface.co/deepseek-ai/DeepSeek-V3.2) | FP8 mixed · 689GB | SGLang |
 
-최고 성능 픽: [best-pick 8×MI300X](docs/best-pick/8xmi300x.md) — FP4·CUDA 전용 양자화 경로 비호환 주의.
+- ⁴ CDNA 3는 FP4 미지원, CUDA 전용 INT4 kernel 비호환 가능 — ROCm 경로 검증 후 투입. ([best-pick 8×MI300X](docs/best-pick/8xmi300x.md))
 
-### 8×B300 288GB — 명목 2.30TB
+### 8×B300 288GB — 2.30TB
 
-| 목표 | 1순위 모델·포맷 | 엔진 |
-|---|---|---|
-| 최대 모델 단일 노드 | [Kimi K3 MXFP4](https://huggingface.co/moonshotai/Kimi-K3) 1560.9GB | SGLang (공식 cookbook) |
-| 고효율 FP4 대형 MoE | [GLM-5.2 NVFP4](https://huggingface.co/nvidia/GLM-5.2-NVFP4) | SGLang/TensorRT-LLM |
+| 목표 | 모델 | 포맷 · 가중치 | 엔진 |
+|---|---|---|---|
+| 최대 모델 단일 노드 | [Kimi K3](https://huggingface.co/moonshotai/Kimi-K3) | MXFP4 · 1,560.9GB | SGLang (공식 cookbook) |
+| 고효율 FP4 대형 MoE | [GLM-5.2](https://huggingface.co/nvidia/GLM-5.2-NVFP4) | NVFP4 | SGLang/TensorRT-LLM |
 
 ## 엔진 선택 요약
 
