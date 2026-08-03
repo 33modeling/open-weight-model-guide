@@ -51,6 +51,7 @@ A100은 40GB와 80GB SKU 결과가 완전히 다르므로 별도로 계산했습
 | 장수 | 목표 | 1순위 모델·포맷 | 엔진 |
 |---:|---|---|---|
 | 2 | 균형 | [Qwen3-32B](https://huggingface.co/Qwen/Qwen3-32B) BF16 | vLLM |
+| 2 | 코딩 품질 (최신 dense) | [Qwen3.6-27B](https://huggingface.co/Qwen/Qwen3.6-27B) BF16 55.6GB, TP=2 | vLLM |
 | 4 | 최대 모델 | [Qwen3-235B-A22B GPTQ INT4](https://huggingface.co/Qwen/Qwen3-235B-A22B-GPTQ-Int4) | vLLM |
 | 8 | 최대 모델 | [Qwen3.5-397B-A17B GPTQ INT4](https://huggingface.co/Qwen/Qwen3.5-397B-A17B-GPTQ-Int4) | vLLM |
 
@@ -59,6 +60,7 @@ A100은 40GB와 80GB SKU 결과가 완전히 다르므로 별도로 계산했습
 | 장수 | 목표 | 1순위 모델·포맷 | 엔진 |
 |---:|---|---|---|
 | 2 | 최대 모델 | [Qwen3-235B-A22B GPTQ INT4](https://huggingface.co/Qwen/Qwen3-235B-A22B-GPTQ-Int4) | vLLM |
+| 2 | 품질 + 2 replicas | [Qwen3.6-27B](https://huggingface.co/Qwen/Qwen3.6-27B) BF16, GPU당 1 replica | vLLM |
 | 4 | 최대 모델 | [Qwen3.5-397B-A17B GPTQ INT4](https://huggingface.co/Qwen/Qwen3.5-397B-A17B-GPTQ-Int4) | vLLM |
 | 8 | 균형·넓은 KV | [Qwen3.5-397B-A17B GPTQ INT4](https://huggingface.co/Qwen/Qwen3.5-397B-A17B-GPTQ-Int4) | vLLM/SGLang |
 
@@ -69,6 +71,8 @@ A100은 FP8 Tensor Core가 없으므로 BF16·INT4 경로를 우선합니다.
 | 장수 | 목표 | 1순위 모델·포맷 | 엔진 |
 |---:|---|---|---|
 | 2 | 균형 | [Qwen3.5-122B-A10B FP8](https://huggingface.co/Qwen/Qwen3.5-122B-A10B-FP8) | vLLM |
+| 2 | 코딩 품질·복제 유연성 | [Qwen3.6-27B FP8](https://huggingface.co/Qwen/Qwen3.6-27B-FP8) 30.9GB, GPU당 1 replica | vLLM/SGLang |
+| 4 | agent loop 속도 | [Qwen3.6-35B-A3B FP8](https://huggingface.co/Qwen/Qwen3.6-35B-A3B-FP8) 37.5GB, GPU당 1 replica | vLLM/SGLang |
 | 4 | coding agent | [MiniMax-M2.7 FP8](https://huggingface.co/MiniMaxAI/MiniMax-M2.7) | SGLang/vLLM |
 
 ### 8×H100 80GB — 명목 640GB
@@ -80,6 +84,7 @@ A100은 FP8 Tensor Core가 없으므로 BF16·INT4 경로를 우선합니다.
 | agentic coding·멀티모달 | [Kimi K2.6 Native INT4](https://huggingface.co/moonshotai/Kimi-K2.6), 적재 경계 | vLLM/SGLang |
 | 코딩 특화 대형 | [Kimi K2.7 Code Native INT4](https://huggingface.co/moonshotai/Kimi-K2.7-Code), 적재 경계 — 16×H100 권장 | vLLM/SGLang |
 | KV 여유·안정적 운영 | [Qwen3.5-397B-A17B FP8](https://huggingface.co/Qwen/Qwen3.5-397B-A17B-FP8) | vLLM/SGLang |
+| 고동시성 소형 서빙 | [Qwen3.6-27B FP8](https://huggingface.co/Qwen/Qwen3.6-27B-FP8) × GPU당 1 replica(8개) — SWE-bench V 77.2로 소형 중 최상 | vLLM |
 
 최고 성능 한 개 픽과 순위: [best-pick 8×H100](docs/best-pick/8xh100.md) · 목적별 결정표: [hardware-matrix §8×H100](docs/hardware-matrix.md#8h100)
 
