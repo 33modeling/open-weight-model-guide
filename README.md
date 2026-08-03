@@ -62,6 +62,7 @@ A100은 40GB와 80GB SKU 결과가 완전히 다르므로 별도로 계산했습
 | 2 | 최대 모델 | [Qwen3-235B-A22B GPTQ INT4](https://huggingface.co/Qwen/Qwen3-235B-A22B-GPTQ-Int4) | vLLM |
 | 2 | 품질 + 2 replicas | [Qwen3.6-27B](https://huggingface.co/Qwen/Qwen3.6-27B) BF16, GPU당 1 replica | vLLM |
 | 4 | 최대 모델 | [Qwen3.5-397B-A17B GPTQ INT4](https://huggingface.co/Qwen/Qwen3.5-397B-A17B-GPTQ-Int4) | vLLM |
+| 4 | coding agent | [MiniMax-M2.7](https://huggingface.co/MiniMaxAI/MiniMax-M2.7) 공식 FP8 230.1GB (A100은 weight-only 경로) | vLLM |
 | 8 | 균형·넓은 KV | [Qwen3.5-397B-A17B GPTQ INT4](https://huggingface.co/Qwen/Qwen3.5-397B-A17B-GPTQ-Int4) | vLLM/SGLang |
 
 A100은 FP8 Tensor Core가 없으므로 BF16·INT4 경로를 우선합니다.
@@ -85,6 +86,7 @@ A100은 FP8 Tensor Core가 없으므로 BF16·INT4 경로를 우선합니다.
 | 코딩 특화 대형 | [Kimi K2.7 Code Native INT4](https://huggingface.co/moonshotai/Kimi-K2.7-Code), 적재 경계 — 16×H100 권장 | vLLM/SGLang |
 | KV 여유·안정적 운영 | [Qwen3.5-397B-A17B FP8](https://huggingface.co/Qwen/Qwen3.5-397B-A17B-FP8) | vLLM/SGLang |
 | 고동시성 소형 서빙 | [Qwen3.6-27B FP8](https://huggingface.co/Qwen/Qwen3.6-27B-FP8) × GPU당 1 replica(8개) — SWE-bench V 77.2로 소형 중 최상 | vLLM |
+| coding agent·KV 대여유 | [MiniMax-M2.7 FP8](https://huggingface.co/MiniMaxAI/MiniMax-M2.7) 230.1GB — 잔여 ~400GB로 초장문·고동시성 | SGLang/vLLM |
 
 최고 성능 한 개 픽과 순위: [best-pick 8×H100](docs/best-pick/8xh100.md) · 목적별 결정표: [hardware-matrix §8×H100](docs/hardware-matrix.md#8h100)
 
