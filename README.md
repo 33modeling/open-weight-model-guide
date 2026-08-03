@@ -4,6 +4,8 @@
 
 > 기준일: 2026-07-20 (최근 갱신 2026-08-03)
 >
+> 예정: Qwen3.8 오픈웨이트 공개 시 추가 — 준비 문서 [docs/upcoming/qwen3.8.md](docs/upcoming/qwen3.8.md)
+>
 > 범위: 추론 중심. 학습·파인튜닝 자원은 [학습 GPU 자원 산정](docs/training-sizing.md)에서 별도로 다룹니다. 구성별로 "지금 뭘 띄울까" 한 개만 고르려면 [구성별 최고 성능 픽](docs/best-pick/README.md)을 봅니다.
 
 ## 포함된 하드웨어
