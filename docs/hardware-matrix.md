@@ -12,12 +12,15 @@
 | 2×RTX 4090 24GB | 48GB | 약 38~42GB | Ada, FP8, NVLink 없음 |
 | 2×A100 40GB | 80GB | 약 66~72GB | Ampere, BF16/INT4, FP8 네이티브 아님 |
 | 4×A100 40GB | 160GB | 약 132~144GB | HGX/NVSwitch 권장 |
+| 6×A100 40GB | 240GB | 약 198~216GB | HGX/NVSwitch |
 | 8×A100 40GB | 320GB | 약 264~288GB | HGX/NVSwitch |
 | 2×A100 80GB | 160GB | 약 136~144GB | BF16/INT4 |
 | 4×A100 80GB | 320GB | 약 272~288GB | HGX/NVSwitch 권장 |
+| 6×A100 80GB | 480GB | 약 408~432GB | HGX/NVSwitch |
 | 8×A100 80GB | 640GB | 약 544~576GB | DGX/HGX |
 | 2×H100 80GB | 160GB | 약 136~144GB | Hopper, FP8 |
 | 4×H100 80GB | 320GB | 약 272~288GB | NVLink/NVSwitch |
+| 6×H100 80GB | 480GB | 약 408~432GB | NVLink/NVSwitch, TP=6 지원 확인 |
 | 8×H100 80GB | 640GB | 약 544~576GB | DGX/HGX NVSwitch |
 | 16×H100 80GB | 1.28TB | 약 1.09~1.15TB | 보통 8-GPU 노드 2개 |
 
