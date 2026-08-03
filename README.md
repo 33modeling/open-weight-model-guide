@@ -16,12 +16,15 @@
 | 2×RTX 4090 24GB | 48GB | PCIe 4.0, NVLink 없음 | 27B~35B 양자화, 2 replicas |
 | 2×A100 40GB | 80GB | PCIe/NVLink | 32B BF16 또는 70B급 INT4 |
 | 4×A100 40GB | 160GB | HGX/NVSwitch 권장 | 122B~235B INT4 |
+| 6×A100 40GB | 240GB | HGX/NVSwitch | MiniMax-M2.7 W4A16 · 235B/397B INT4는 경계 미달 |
 | 8×A100 40GB | 320GB | HGX/NVSwitch | 397B INT4 |
 | 2×A100 80GB | 160GB | PCIe/NVLink | 235B INT4 |
 | 4×A100 80GB | 320GB | HGX/NVSwitch | 397B INT4 |
+| 6×A100 80GB | 480GB | HGX/NVSwitch | 397B INT4 넓은 KV |
 | 8×A100 80GB | 640GB | HGX/NVSwitch | 397B INT4, 1T INT4 경계 |
 | 2×H100 80GB | 160GB | NVLink | 122B FP8, 235B INT4 |
 | 4×H100 80GB | 320GB | NVLink/NVSwitch | MiniMax-M2.7 FP8, 397B INT4 |
+| 6×H100 80GB | 480GB | NVLink/NVSwitch | GLM-5.2 W4A8 경계(TP=6 지원 확인) · 397B FP8 경계 |
 | 8×H100 80GB | 640GB | HGX/DGX NVSwitch | GLM-5.2 W4A8, DeepSeek V4 Flash, Kimi K2.6/K2.7 INT4 경계 |
 | 16×H100 80GB | 1.28TB | 2 nodes + InfiniBand 권장 | V4 Pro, GLM-5.2 FP8 |
 | 8×MI300X 192GB | 1.54TB | OAM + Infinity Fabric | 대형 MoE FP8 여유 적재 (ROCm) |
@@ -48,16 +51,19 @@ A100은 40GB와 80GB SKU 결과가 완전히 다르므로 별도로 계산했습
 
 - 세부 선택: [27B Dense vs 35B-A3B 결정표](docs/hardware-matrix.md#qwen36-27b-dense-vs-35b-a3b-결정표)
 
-### A100 40GB (2·4·8장)
+### A100 40GB (2·4·6·8장)
 
 | 장수 | 목표 | 모델 | 포맷 · 가중치 | 엔진 |
 |---:|---|---|---|---|
 | 2 | 균형 | [Qwen3-32B](https://huggingface.co/Qwen/Qwen3-32B) | BF16 · 66.9GB | vLLM |
 | 2 | 코딩 품질 | [Qwen3.6-27B](https://huggingface.co/Qwen/Qwen3.6-27B) | BF16 · 55.6GB · TP=2 | vLLM |
 | 4 | 최대 모델 | [Qwen3-235B-A22B](https://huggingface.co/Qwen/Qwen3-235B-A22B-GPTQ-Int4) | GPTQ INT4 · 239GB급 | vLLM |
+| 6 | coding agent | [MiniMax-M2.7](https://huggingface.co/demon-zombie/MiniMax-M2.7-AWQ-4bit) | AWQ W4A16 · 119.8GB · KV 여유 | vLLM |
 | 8 | 최대 모델 | [Qwen3.5-397B-A17B](https://huggingface.co/Qwen/Qwen3.5-397B-A17B-GPTQ-Int4) | GPTQ INT4 · 235.7GB | vLLM |
 
-### A100 80GB (2·4·8장)
+- 6장(240GB)에서 235B/397B INT4(239GB급·235.7GB)는 KV 공간이 없어 경계 미달 — 8장부터.
+
+### A100 80GB (2·4·6·8장)
 
 | 장수 | 목표 | 모델 | 포맷 · 가중치 | 엔진 |
 |---:|---|---|---|---|
@@ -65,11 +71,12 @@ A100은 40GB와 80GB SKU 결과가 완전히 다르므로 별도로 계산했습
 | 2 | 품질 + 2 replicas | [Qwen3.6-27B](https://huggingface.co/Qwen/Qwen3.6-27B) | BF16 · GPU당 1 replica | vLLM |
 | 4 | 최대 모델 | [Qwen3.5-397B-A17B](https://huggingface.co/Qwen/Qwen3.5-397B-A17B-GPTQ-Int4) | GPTQ INT4 · 235.7GB | vLLM |
 | 4 | coding agent | [MiniMax-M2.7](https://huggingface.co/MiniMaxAI/MiniMax-M2.7) | 공식 FP8 · 230.1GB¹ | vLLM |
+| 6 | 최대 모델·넓은 KV | [Qwen3.5-397B-A17B](https://huggingface.co/Qwen/Qwen3.5-397B-A17B-GPTQ-Int4) | GPTQ INT4 · 235.7GB · KV ~240GB | vLLM/SGLang |
 | 8 | 균형·넓은 KV | [Qwen3.5-397B-A17B](https://huggingface.co/Qwen/Qwen3.5-397B-A17B-GPTQ-Int4) | GPTQ INT4 · 235.7GB | vLLM/SGLang |
 
 - ¹ A100은 FP8 Tensor Core가 없어 weight-only 경로. BF16·INT4를 우선합니다.
 
-### H100 80GB (2·4장)
+### H100 80GB (2·4·6장)
 
 | 장수 | 목표 | 모델 | 포맷 · 가중치 | 엔진 |
 |---:|---|---|---|---|
@@ -77,6 +84,10 @@ A100은 40GB와 80GB SKU 결과가 완전히 다르므로 별도로 계산했습
 | 2 | 코딩 품질·복제 유연성 | [Qwen3.6-27B](https://huggingface.co/Qwen/Qwen3.6-27B-FP8) | FP8 · 30.9GB · GPU당 1 replica | vLLM/SGLang |
 | 4 | coding agent | [MiniMax-M2.7](https://huggingface.co/MiniMaxAI/MiniMax-M2.7) | FP8 · 230.1GB | SGLang/vLLM |
 | 4 | agent loop 속도 | [Qwen3.6-35B-A3B](https://huggingface.co/Qwen/Qwen3.6-35B-A3B-FP8) | FP8 · 37.5GB · GPU당 1 replica | vLLM/SGLang |
+| 6 | 장문 context·코딩 | [GLM-5.2](https://huggingface.co/PhalaCloud/GLM-5.2-W4AFP8) | W4A8 · 399.7GB · 잔여 ~80GB⁵ | SGLang |
+| 6 | KV 여유 운영 | [MiniMax-M2.7](https://huggingface.co/MiniMaxAI/MiniMax-M2.7) | FP8 · 230.1GB · TP=2×3 replicas 가능 | SGLang/vLLM |
+
+- ⁵ TP=6은 attention head·expert 분할이 안 되는 모델이 많음 — 지원 확인 후, 안 되면 TP=2×PP=3 또는 4장+2장 분리 운용.
 
 ### 8×H100 80GB — 640GB
 
