@@ -2,7 +2,7 @@
 
 2×RTX 2080 Ti부터 16×H100, 8×MI300X·8×B300까지, GPU 구성별로 실행 가능한 오픈웨이트 모델과 양자화 포맷, 추론 엔진을 정리한 실무 가이드입니다.
 
-> 기준일: 2026-07-20 (최근 갱신 2026-08-03)
+> 기준일: 2026-07-20 (최근 갱신 2026-08-04)
 >
 > 예정: Qwen3.8 오픈웨이트 공개 시 추가 — 준비 문서 [docs/upcoming/qwen3.8.md](docs/upcoming/qwen3.8.md)
 >
@@ -180,6 +180,7 @@ A100은 40GB와 80GB SKU 결과가 완전히 다르므로 별도로 계산했습
   - [vLLM](docs/serving/vllm.md)
   - [SGLang](docs/serving/sglang.md)
 - [모델·양자화 카탈로그와 Hugging Face 링크](docs/model-options.md)
+- [대형 uncensored 모델 전용 카탈로그](docs/uncensored-large-models/README.md) — 70B 이상 본편과 RTX 4090용 27B~40B 부록, 실제 파일 크기·라이선스·실행 명령
 - [VRAM 계산법과 Kimi K3 분석](docs/memory-sizing.md)
 - [학습 GPU 자원 산정 — Qwen 7B·27B·35B](docs/training-sizing.md)
 - [공식 출처](docs/sources.md)
