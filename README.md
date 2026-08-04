@@ -180,7 +180,7 @@ A100은 40GB와 80GB SKU 결과가 완전히 다르므로 별도로 계산했습
   - [vLLM](docs/serving/vllm.md)
   - [SGLang](docs/serving/sglang.md)
 - [모델·양자화 카탈로그와 Hugging Face 링크](docs/model-options.md)
-- [대형 uncensored 모델 전용 카탈로그](docs/uncensored-large-models/README.md) — 70B 이상 본편과 RTX 4090용 27B~40B 부록, 실제 파일 크기·라이선스·실행 명령
+- [최신 uncensored 모델 카탈로그와 실행 스크립트](docs/uncensored-large-models/README.md) — Qwen3.6 27B/35B, 2×RTX 4090, A100/H100와 MiniMax-M3급 클러스터 구성
 - [VRAM 계산법과 Kimi K3 분석](docs/memory-sizing.md)
 - [학습 GPU 자원 산정 — Qwen 7B·27B·35B](docs/training-sizing.md)
 - [공식 출처](docs/sources.md)

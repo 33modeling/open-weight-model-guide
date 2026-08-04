@@ -2,7 +2,7 @@
 
 크기는 2026-07-19 기준 Hugging Face 현재 파일의 합계입니다. 저장소 전체 history 용량이 아니라 현재 체크포인트 파일을 기준으로 했습니다.
 
-> Uncensored, abliterated, derestricted 파생 모델은 [대형 uncensored 모델 전용 카탈로그](uncensored-large-models/README.md)에서 별도로 다룹니다. 70B 이상 본편과 1×/2×RTX 4090 실행표를 분리했습니다.
+> Uncensored, abliterated 파생 모델은 [최신 uncensored 모델 전용 카탈로그](uncensored-large-models/README.md)에서 별도로 다룹니다. Qwen3.6 27B/35B의 2×RTX 4090 실행부터 A100/H100와 MiniMax-M3급 클러스터까지 현재 모델 카드 기준으로 분리했습니다.
 
 ## 크기 순 정리
 
